@@ -1015,6 +1015,173 @@
         }
 
         
+
+
+        /* Leave/Off Day Styles */
+        .leave-section {
+            margin-top: 12px;
+            padding: 12px;
+            background: rgba(255, 146, 43, 0.1);
+            border-radius: 8px;
+            border: 1px dashed var(--ocak);
+        }
+
+        .leave-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--ocak);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .leave-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .leave-item {
+            padding: 4px 10px;
+            background: var(--ocak);
+            color: white;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        /* Gamification Styles */
+        .badge-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 12px;
+        }
+
+        .badge-item {
+            background: var(--bg-tertiary);
+            padding: 16px;
+            border-radius: 12px;
+            border: 2px solid var(--border);
+            text-align: center;
+            transition: all 0.2s ease;
+        }
+
+        .badge-item.earned {
+            border-color: #ffd700;
+            background: rgba(255, 215, 0, 0.1);
+        }
+
+        .badge-item.locked {
+            opacity: 0.5;
+            filter: grayscale(1);
+        }
+
+        .badge-icon {
+            font-size: 2.5rem;
+            margin-bottom: 8px;
+        }
+
+        .badge-name {
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .badge-desc {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .leaderboard-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+
+        .leaderboard-tab {
+            padding: 8px 16px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: var(--bg-tertiary);
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+        }
+
+        .leaderboard-tab.active {
+            background: var(--accent);
+            border-color: var(--accent);
+        }
+
+        .leaderboard-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .leaderboard-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px;
+            background: var(--bg-tertiary);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            transition: all 0.2s ease;
+        }
+
+        .leaderboard-item:hover {
+            transform: translateX(4px);
+            border-color: var(--accent);
+        }
+
+        .leaderboard-item.gold {
+            border-color: #ffd700;
+            background: rgba(255, 215, 0, 0.1);
+        }
+
+        .leaderboard-item.silver {
+            border-color: #c0c0c0;
+            background: rgba(192, 192, 192, 0.1);
+        }
+
+        .leaderboard-item.bronze {
+            border-color: #cd7f32;
+            background: rgba(205, 127, 50, 0.1);
+        }
+
+        .leaderboard-rank {
+            font-size: 1.8rem;
+            font-weight: 700;
+            min-width: 50px;
+            text-align: center;
+        }
+
+        .leaderboard-info {
+            flex: 1;
+        }
+
+        .leaderboard-name {
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 4px;
+        }
+
+        .leaderboard-stats {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .leaderboard-badges {
+            display: flex;
+            gap: 4px;
+            font-size: 1.2rem;
+        }
+
         /* Performance Styles */
         .stars {
             display: flex;
@@ -1109,6 +1276,10 @@
                 <div class="nav-item" onclick="showPage('performance')">
                     <i>⭐</i>
                     <span>Performans</span>
+                </div>
+                <div class="nav-item" onclick="showPage('gamification')">
+                    <i>🏆</i>
+                    <span>Liderlik & Rozetler</span>
                 </div>
             </nav>
         </aside>
@@ -1278,6 +1449,15 @@
                     </table>
                 </div>
 
+
+                <div class="card">
+                    <div class="card-title">📅 İzinli Personel Yönetimi</div>
+                    <div style="margin-bottom: 16px;">
+                        <button class="btn btn-secondary" onclick="openLeaveModal()">➕ İzin Ekle</button>
+                    </div>
+                    <div id="leave-summary"></div>
+                </div>
+
                 <div class="staff-pool-container">
                     <div class="pool-header">
                         <div class="pool-title">Müsait Personel (Sürükle-Bırak)</div>
@@ -1323,6 +1503,30 @@
                 <div class="card">
                     <div class="card-title">📋 Son Değerlendirmeler</div>
                     <div class="review-list" id="review-list"></div>
+                </div>
+            </div>
+
+
+            <!-- Gamification Page -->
+            <div id="gamification-page" class="page">
+                <div class="page-header">
+                    <h2>🏆 Liderlik & Rozetler</h2>
+                    <p>Başarıları ve liderlik sıralamasını görüntüleyin</p>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">🏆 Liderlik Panosu</div>
+                    <div class="leaderboard-tabs">
+                        <div class="leaderboard-tab active" onclick="showLeaderboard('weekly')">Bu Hafta</div>
+                        <div class="leaderboard-tab" onclick="showLeaderboard('alltime')">Tüm Zamanlar</div>
+                        <div class="leaderboard-tab" onclick="showLeaderboard('performance')">Performans</div>
+                    </div>
+                    <div class="leaderboard-list" id="leaderboard-list"></div>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">🎖️ Rozetler</div>
+                    <div class="badge-grid" id="all-badges"></div>
                 </div>
             </div>
 
@@ -1459,6 +1663,48 @@
         </div>
     </div>
 
+
+    <!-- Leave Modal -->
+    <div class="modal-overlay" id="leave-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title">İzin Ekle</div>
+                <button class="close-btn" onclick="closeLeaveModal()">×</button>
+            </div>
+            <form onsubmit="saveLeave(event)">
+                <div class="form-group">
+                    <label>Personel</label>
+                    <select id="leave-staff" required></select>
+                </div>
+                <div class="form-group">
+                    <label>Gün</label>
+                    <select id="leave-day" required>
+                        <option value="Pazartesi">Pazartesi</option>
+                        <option value="Salı">Salı</option>
+                        <option value="Çarşamba">Çarşamba</option>
+                        <option value="Perşembe">Perşembe</option>
+                        <option value="Cuma">Cuma</option>
+                        <option value="Cumartesi">Cumartesi</option>
+                        <option value="Pazar">Pazar</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>İzin Tipi</label>
+                    <select id="leave-type">
+                        <option value="Yıllık İzin">Yıllık İzin</option>
+                        <option value="Hastalık">Hastalık</option>
+                        <option value="Mazeret">Mazeret</option>
+                        <option value="Ücretsiz İzin">Ücretsiz İzin</option>
+                    </select>
+                </div>
+                <div style="display: flex; gap: 12px; margin-top: 20px;">
+                    <button type="submit" class="btn btn-primary" style="flex: 1;">Kaydet</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeLeaveModal()">İptal</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- Alert -->
     <div class="alert" id="alert">
         <span id="alert-icon">⚠️</span>
@@ -1474,21 +1720,21 @@
     <script>
         // Initial Data
         let staff = [
-            { id: 1, name: "Metehan Arslan", positions: [], role: "Mesul Müdür" },
-            { id: 2, name: "Halime Göksü", positions: ["Izgara", "Mutfak", "Ocak"], role: "" },
-            { id: 3, name: "Gizem Erdoğdu", positions: ["Mutfak", "Ocak", "Kasiyer"], role: "" },
-            { id: 4, name: "Batuhan Buyral", positions: ["Mutfak", "Ocak", "Kasiyer", "Garson"], role: "" },
-            { id: 5, name: "Halil İbrahim Uzun", positions: ["Izgara", "Mutfak", "Ocak", "Garson"], role: "" },
-            { id: 6, name: "Hava Akyüz", positions: ["Izgara", "Mutfak", "Ocak"], role: "" },
-            { id: 7, name: "Mine Pehlivanoğlu", positions: ["Mutfak"], role: "" },
-            { id: 8, name: "Melda Yılmaz", positions: ["Kasiyer", "Garson"], role: "" },
-            { id: 9, name: "Ceren Erdem", positions: ["Kasiyer", "Garson"], role: "" },
-            { id: 10, name: "Elif Yıldırım", positions: ["Kasiyer", "Garson"], role: "" },
-            { id: 11, name: "Tuba Bozaklı", positions: ["Kasiyer", "Garson"], role: "" },
-            { id: 12, name: "Emircan Biçer", positions: ["Garson"], role: "" },
-            { id: 13, name: "Burak Sancar", positions: ["Garson"], role: "" },
-            { id: 14, name: "Nesrin Karadeniz", positions: ["Temizlik"], role: "" },
-            { id: 15, name: "Şiyar Onğulu", positions: ["Garson"], role: "Part-time" }
+            { id: 1, name: "Metehan Arslan", positions: [], role: "Mesul Müdür", totalHours: 0, badges: [] },
+            { id: 2, name: "Halime Göksü", positions: ["Izgara", "Mutfak", "Ocak"], role: "", totalHours: 0, badges: [] },
+            { id: 3, name: "Gizem Erdoğdu", positions: ["Mutfak", "Ocak", "Kasiyer"], role: "", totalHours: 0, badges: [] },
+            { id: 4, name: "Batuhan Buyral", positions: ["Mutfak", "Ocak", "Kasiyer", "Garson"], role: "", totalHours: 0, badges: [] },
+            { id: 5, name: "Halil İbrahim Uzun", positions: ["Izgara", "Mutfak", "Ocak", "Garson"], role: "", totalHours: 0, badges: [] },
+            { id: 6, name: "Hava Akyüz", positions: ["Izgara", "Mutfak", "Ocak"], role: "", totalHours: 0, badges: [] },
+            { id: 7, name: "Mine Pehlivanoğlu", positions: ["Mutfak"], role: "", totalHours: 0, badges: [] },
+            { id: 8, name: "Melda Yılmaz", positions: ["Kasiyer", "Garson"], role: "", totalHours: 0, badges: [] },
+            { id: 9, name: "Ceren Erdem", positions: ["Kasiyer", "Garson"], role: "", totalHours: 0, badges: [] },
+            { id: 10, name: "Elif Yıldırım", positions: ["Kasiyer", "Garson"], role: "", totalHours: 0, badges: [] },
+            { id: 11, name: "Tuba Bozaklı", positions: ["Kasiyer", "Garson"], role: "", totalHours: 0, badges: [] },
+            { id: 12, name: "Emircan Biçer", positions: ["Garson"], role: "", totalHours: 0, badges: [] },
+            { id: 13, name: "Burak Sancar", positions: ["Garson"], role: "", totalHours: 0, badges: [] },
+            { id: 14, name: "Nesrin Karadeniz", positions: ["Temizlik"], role: "", totalHours: 0, badges: [] },
+            { id: 15, name: "Şiyar Onğulu", positions: ["Garson"], role: "Part-time", totalHours: 0, badges: [] }
         ];
 
         const days = ['Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi', 'Pazar'];
@@ -1518,6 +1764,24 @@
 
 
         let performances = [];
+
+        // Badge definitions
+        const badgeDefinitions = [
+            { id: 'novice', name: 'Çaylak', emoji: '🥉', desc: '50 saat', threshold: 50, type: 'hours' },
+            { id: 'experienced', name: 'Deneyimli', emoji: '🥈', desc: '150 saat', threshold: 150, type: 'hours' },
+            { id: 'expert', name: 'Uzman', emoji: '🥇', desc: '300 saat', threshold: 300, type: 'hours' },
+            { id: 'master', name: 'Master', emoji: '💎', desc: '500+ saat', threshold: 500, type: 'hours' },
+            { id: 'izgara-master', name: 'Izgara Ustası', emoji: '🔥', desc: '100 saat ızgara', threshold: 100, type: 'position', position: 'Izgara' },
+            { id: 'quick-cashier', name: 'Hızlı Kasiyer', emoji: '💰', desc: '50 vardiya', threshold: 50, type: 'shifts', position: 'Kasiyer' },
+            { id: 'super-waiter', name: 'Süper Garson', emoji: '🍽️', desc: '200 saat garsonluk', threshold: 200, type: 'position', position: 'Garson' },
+            { id: 'chef-candidate', name: 'Şef Adayı', emoji: '👨‍🍳', desc: '150 saat mutfak', threshold: 150, type: 'position', position: 'Mutfak' },
+            { id: 'star-performer', name: 'Mükemmel Performans', emoji: '⭐', desc: '5/5 ortalama', threshold: 4.8, type: 'performance' },
+            { id: 'versatile', name: 'Çok Yönlü', emoji: '🔄', desc: '4 pozisyonda çalıştı', threshold: 4, type: 'positions' }
+        ];
+
+        let currentLeaderboardType = 'weekly';
+        let leaves = {}; // { day: [{ staffId, type }] }
+
         let currentRatings = {};
 
         let schedule = {};
@@ -1537,10 +1801,12 @@
             const savedStaff = localStorage.getItem('staff');
             const savedSchedule = localStorage.getItem('schedule');
             const savedPerformances = localStorage.getItem('performances');
+            const savedLeaves = localStorage.getItem('leaves');
             
             if (savedStaff) staff = JSON.parse(savedStaff);
             if (savedSchedule) schedule = JSON.parse(savedSchedule);
             if (savedPerformances) performances = JSON.parse(savedPerformances);
+            if (savedLeaves) leaves = JSON.parse(savedLeaves);
         }
 
         // Save to localStorage
@@ -1548,6 +1814,7 @@
             localStorage.setItem('staff', JSON.stringify(staff));
             localStorage.setItem('schedule', JSON.stringify(schedule));
             localStorage.setItem('performances', JSON.stringify(performances));
+            localStorage.setItem('leaves', JSON.stringify(leaves));
         }
 
         // Initialize
@@ -1555,6 +1822,7 @@
         updateDashboard();
         renderStaffList();
         renderSchedule();
+        renderLeaveSummary();
         renderStaffPool();
         updateWeekRange();
         highlightToday();
@@ -1569,9 +1837,12 @@
             
             if (page === 'schedule') {
                 renderSchedule();
+        renderLeaveSummary();
                 renderStaffPool();
             } else if (page === 'performance') {
                 renderPerformancePage();
+            } else if (page === 'gamification') {
+                renderGamificationPage();
             }
         }
 
@@ -1612,6 +1883,8 @@
 
         // Dashboard
         function updateDashboard() {
+            initializeLeaves();
+        updateBadges();
             document.getElementById('total-staff').textContent = staff.length;
             
             let totalShifts = 0;
@@ -1855,8 +2128,12 @@
                                 <button class="icon-btn delete" onclick="deleteStaff(${s.id})">🗑️</button>
                             </div>
                         </div>
+                        ${s.badges.length > 0 ? `<div style="font-size: 1.2rem; margin-bottom: 8px;">${s.badges.slice(0, 3).map(b => badgeDefinitions.find(bd => bd.id === b)?.emoji || '').join(' ')}</div>` : ''}
                         <div class="positions">
                             ${isManager ? '<div class="position-tag" style="background: #ffd700; color: #1a1a2e;">👑 Tüm Pozisyonlar</div>' : positionTags}
+                        </div>
+                        <div style="margin-top: 8px; font-size: 0.85rem; color: var(--text-secondary);">
+                            ${s.totalHours} saat çalıştı
                         </div>
                     </div>
                 `;
@@ -1911,6 +2188,7 @@
             saveToStorage();
             renderStaffList();
             renderSchedule();
+        renderLeaveSummary();
             updateDashboard();
             showAlert('Personel silindi', 'success');
         }
@@ -2007,6 +2285,7 @@
                 return `
                     <div class="pool-item" draggable="true" ondragstart="drag(event, ${s.id})" data-positions="${s.positions.join(',')}">
                         <div>${s.name}</div>
+                        ${s.badges.length > 0 ? `<div style="font-size: 1.2rem; margin-bottom: 8px;">${s.badges.slice(0, 3).map(b => badgeDefinitions.find(bd => bd.id === b)?.emoji || '').join(' ')}</div>` : ''}
                         <div class="positions">${displayPositions}</div>
                     </div>
                 `;
@@ -2101,7 +2380,10 @@
             
             saveToStorage();
             renderSchedule();
+        renderLeaveSummary();
             updateDashboard();
+            initializeLeaves();
+        updateBadges();
             showAlert('Vardiya atandı', 'success');
         }
 
@@ -2178,7 +2460,10 @@
             schedule[day][shiftId].splice(index, 1);
             saveToStorage();
             renderSchedule();
+        renderLeaveSummary();
             updateDashboard();
+            initializeLeaves();
+        updateBadges();
             showAlert('Atama kaldırıldı', 'success');
         }
 
@@ -2199,6 +2484,7 @@
             
             saveToStorage();
             renderSchedule();
+        renderLeaveSummary();
             updateDashboard();
             showAlert('Hafta temizlendi', 'success');
         }
@@ -2477,6 +2763,9 @@
                             <strong>${s.name}</strong>
                             <span style="color: #ffd700; font-size: 1.1rem;">⭐ ${avg.toFixed(2)}/5</span>
                         </div>
+                        <div style="margin-top: 8px; font-size: 0.85rem; color: var(--text-secondary);">
+                            ${s.totalHours} saat çalıştı
+                        </div>
                     </div>
                 `;
             }).join('');
@@ -2493,6 +2782,265 @@
             return total / perfs.length;
         }
 
+
+        // GAMIFICATION MODULE
+        function updateTotalHours() {
+            staff.forEach(s => {
+                let hours = 0;
+                days.forEach(day => {
+                    shifts.forEach(shift => {
+                        const assigned = schedule[day][shift.id].find(a => a.staffId === s.id);
+                        if (assigned) hours += 8;
+                    });
+                });
+                s.totalHours = hours;
+            });
+        }
+
+        function updateBadges() {
+            updateTotalHours();
+            
+            staff.forEach(s => {
+                const earned = [];
+                
+                // Hours badges
+                if (s.totalHours >= 500) earned.push('master');
+                else if (s.totalHours >= 300) earned.push('expert');
+                else if (s.totalHours >= 150) earned.push('experienced');
+                else if (s.totalHours >= 50) earned.push('novice');
+                
+                // Position hours
+                const posHours = {};
+                days.forEach(day => {
+                    shifts.forEach(shift => {
+                        schedule[day][shift.id].forEach(a => {
+                            if (a.staffId === s.id) {
+                                posHours[a.position] = (posHours[a.position] || 0) + 8;
+                            }
+                        });
+                    });
+                });
+                
+                if (posHours['Izgara'] >= 100) earned.push('izgara-master');
+                if (posHours['Garson'] >= 200) earned.push('super-waiter');
+                if (posHours['Mutfak'] >= 150) earned.push('chef-candidate');
+                
+                // Shift count for cashier
+                let cashierShifts = 0;
+                days.forEach(day => {
+                    shifts.forEach(shift => {
+                        if (schedule[day][shift.id].some(a => a.staffId === s.id && a.position === 'Kasiyer')) {
+                            cashierShifts++;
+                        }
+                    });
+                });
+                if (cashierShifts >= 50) earned.push('quick-cashier');
+                
+                // Performance badge
+                const avg = getAveragePerformance(s.id);
+                if (avg && avg >= 4.8) earned.push('star-performer');
+                
+                // Versatile (worked in 4+ positions)
+                if (Object.keys(posHours).length >= 4) earned.push('versatile');
+                
+                s.badges = earned;
+            });
+            
+            saveToStorage();
+        }
+
+        function renderGamificationPage() {
+            initializeLeaves();
+        updateBadges();
+            renderLeaderboard();
+            renderAllBadges();
+        }
+
+        function showLeaderboard(type) {
+            currentLeaderboardType = type;
+            document.querySelectorAll('.leaderboard-tab').forEach(tab => tab.classList.remove('active'));
+            event.target.classList.add('active');
+            renderLeaderboard();
+        }
+
+        function renderLeaderboard() {
+            const container = document.getElementById('leaderboard-list');
+            let sorted = [];
+            
+            if (currentLeaderboardType === 'weekly') {
+                const staffShifts = {};
+                staff.forEach(s => staffShifts[s.id] = 0);
+                
+                days.forEach(day => {
+                    shifts.forEach(shift => {
+                        schedule[day][shift.id].forEach(a => {
+                            staffShifts[a.staffId]++;
+                        });
+                    });
+                });
+                
+                sorted = staff.map(s => ({
+                    staff: s,
+                    value: staffShifts[s.id],
+                    label: `${staffShifts[s.id]} vardiya`
+                })).filter(x => x.value > 0).sort((a, b) => b.value - a.value);
+                
+            } else if (currentLeaderboardType === 'alltime') {
+                sorted = staff.map(s => ({
+                    staff: s,
+                    value: s.totalHours,
+                    label: `${s.totalHours} saat`
+                })).filter(x => x.value > 0).sort((a, b) => b.value - a.value);
+                
+            } else if (currentLeaderboardType === 'performance') {
+                sorted = staff.map(s => {
+                    const avg = getAveragePerformance(s.id);
+                    return {
+                        staff: s,
+                        value: avg || 0,
+                        label: avg ? `⭐ ${avg.toFixed(2)}/5` : 'Değerlendirilmedi'
+                    };
+                }).filter(x => x.value > 0).sort((a, b) => b.value - a.value);
+            }
+            
+            if (sorted.length === 0) {
+                container.innerHTML = '<div class="empty-list">Henüz veri yok</div>';
+                return;
+            }
+            
+            const medals = ['🥇', '🥈', '🥉'];
+            const classes = ['gold', 'silver', 'bronze'];
+            
+            container.innerHTML = sorted.map((item, index) => {
+                const badgeIcons = item.staff.badges.slice(0, 5).map(b => 
+                    badgeDefinitions.find(bd => bd.id === b)?.emoji || ''
+                ).join(' ');
+                
+                return `
+                    <div class="leaderboard-item ${index < 3 ? classes[index] : ''}">
+                        <div class="leaderboard-rank">${index < 3 ? medals[index] : (index + 1)}</div>
+                        <div class="leaderboard-info">
+                            <div class="leaderboard-name">${item.staff.name}</div>
+                            <div class="leaderboard-stats">${item.label}</div>
+                        </div>
+                        ${badgeIcons ? `<div class="leaderboard-badges">${badgeIcons}</div>` : ''}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderAllBadges() {
+            const container = document.getElementById('all-badges');
+            
+            const allEarned = new Set();
+            staff.forEach(s => {
+                s.badges.forEach(b => allEarned.add(b));
+            });
+            
+            container.innerHTML = badgeDefinitions.map(badge => {
+                const earned = allEarned.has(badge.id);
+                const earners = staff.filter(s => s.badges.includes(badge.id));
+                
+                return `
+                    <div class="badge-item ${earned ? 'earned' : 'locked'}" title="${earners.map(s => s.name).join(', ') || 'Henüz kimse kazanmadı'}">
+                        <div class="badge-icon">${badge.emoji}</div>
+                        <div class="badge-name">${badge.name}</div>
+                        <div class="badge-desc">${badge.desc}</div>
+                        ${earned ? `<div style="font-size: 0.7rem; color: var(--success); margin-top: 4px;">${earners.length} kişi</div>` : ''}
+                    </div>
+                `;
+            }).join('');
+        }
+
+
+        // LEAVE MANAGEMENT
+        function initializeLeaves() {
+            days.forEach(day => {
+                if (!leaves[day]) leaves[day] = [];
+            });
+        }
+
+        function openLeaveModal() {
+            const staffSelect = document.getElementById('leave-staff');
+            staffSelect.innerHTML = staff.map(s => 
+                `<option value="${s.id}">${s.name}</option>`
+            ).join('');
+            document.getElementById('leave-modal').classList.add('show');
+        }
+
+        function closeLeaveModal() {
+            document.getElementById('leave-modal').classList.remove('show');
+        }
+
+        function saveLeave(event) {
+            event.preventDefault();
+            
+            const staffId = parseInt(document.getElementById('leave-staff').value);
+            const day = document.getElementById('leave-day').value;
+            const type = document.getElementById('leave-type').value;
+            
+            if (!leaves[day]) leaves[day] = [];
+            
+            // Zaten izinli mi kontrol et
+            if (leaves[day].some(l => l.staffId === staffId)) {
+                showAlert('Bu personel zaten bu gün izinli!', 'error');
+                return;
+            }
+            
+            leaves[day].push({ staffId, type });
+            saveToStorage();
+            closeLeaveModal();
+            renderLeaveSummary();
+            showAlert('İzin eklendi', 'success');
+        }
+
+        function removeLeave(day, staffId) {
+            if (!confirm('İzni kaldırmak istediğinizden emin misiniz?')) return;
+            
+            leaves[day] = leaves[day].filter(l => l.staffId !== staffId);
+            saveToStorage();
+            renderLeaveSummary();
+            showAlert('İzin kaldırıldı', 'success');
+        }
+
+        function renderLeaveSummary() {
+            const container = document.getElementById('leave-summary');
+            
+            let html = '<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px;">';
+            
+            days.forEach(day => {
+                const dayLeaves = leaves[day] || [];
+                
+                html += `
+                    <div style="background: var(--bg-tertiary); padding: 12px; border-radius: 10px; border: 1px solid var(--border);">
+                        <div style="font-weight: 600; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;">
+                            <span>${day}</span>
+                            <span style="font-size: 0.85rem; color: var(--text-secondary);">${dayLeaves.length} kişi</span>
+                        </div>
+                        ${dayLeaves.length > 0 ? `
+                            <div style="display: flex; flex-direction: column; gap: 6px;">
+                                ${dayLeaves.map(leave => {
+                                    const s = staff.find(x => x.id === leave.staffId);
+                                    return `
+                                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 6px 8px; background: rgba(255, 146, 43, 0.1); border-radius: 6px; font-size: 0.85rem;">
+                                            <span>
+                                                ${s.name}
+                                                <span style="color: var(--text-secondary); font-size: 0.75rem; margin-left: 4px;">(${leave.type})</span>
+                                            </span>
+                                            <button onclick="removeLeave('${day}', ${leave.staffId})" style="background: none; border: none; color: var(--accent); cursor: pointer; font-size: 1rem;">×</button>
+                                        </div>
+                                    `;
+                                }).join('')}
+                            </div>
+                        ` : '<div style="color: var(--text-secondary); font-size: 0.85rem; font-style: italic;">İzinli personel yok</div>'}
+                    </div>
+                `;
+            });
+            
+            html += '</div>';
+            container.innerHTML = html;
+        }
+
         // Close modal on overlay click
         document.getElementById('staff-modal').addEventListener('click', (e) => {
             if (e.target.classList.contains('modal-overlay')) {
@@ -2503,6 +3051,12 @@
         document.getElementById('performance-modal').addEventListener('click', (e) => {
             if (e.target.classList.contains('modal-overlay')) {
                 closePerformanceModal();
+            }
+        });
+
+        document.getElementById('leave-modal').addEventListener('click', (e) => {
+            if (e.target.classList.contains('modal-overlay')) {
+                closeLeaveModal();
             }
         });
     </script>
