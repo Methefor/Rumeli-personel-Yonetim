@@ -1933,7 +1933,7 @@
         
         const positionEmojis = {
             'Kasiyer': '💰',
-            'Ocak': '🍳',
+            'Ocak': '☕',
             'Mutfak': '👨‍🍳',
             'Garson': '🍽️',
             'Temizlik': '🧹',
@@ -1992,7 +1992,7 @@
 
         // Initialize schedule
         days.forEach(day => {
-            schedule[day] = {};
+            if (!schedule[day]) schedule[day] = {};
             shifts.forEach(shift => {
                 schedule[day][shift.id] = [];
             });
@@ -2029,73 +2029,39 @@
         }
 
         // Initialize
+        
+        // INITIALIZATION - Sistem başlatma
         loadFromStorage();
+        
+        // Aktif vardiyaları kontrol et
+        if (!activeShifts || activeShifts.length === 0) {
+            activeShifts = ['morning', 'evening'];
+        }
+        
+        // Schedule'ı tüm vardiyalar için başlat
+        days.forEach(day => {
+            if (!schedule[day]) schedule[day] = {};
+            shifts.forEach(shift => {
+                if (!schedule[day][shift.id]) {
+                    schedule[day][shift.id] = [];
+                }
+            });
+        });
+        
+        // Leaves'i başlat
+        days.forEach(day => {
+            if (!leaves[day]) leaves[day] = [];
+        });
+        
+        // Diğer başlatmalar
+        initializeLeaves();
+        updateBadges();
         updateDashboard();
         renderStaffList();
         renderSchedule();
-        renderLeaveSummary();
         renderStaffPool();
         updateWeekRange();
         highlightToday();
-
-        // Navigation
-        function showPage(page) {
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            
-            document.getElementById(page + '-page').classList.add('active');
-            event.target.closest('.nav-item').classList.add('active');
-            
-            if (page === 'schedule') {
-                renderSchedule();
-        renderLeaveSummary();
-                renderStaffPool();
-            } else if (page === 'performance') {
-                renderPerformancePage();
-            } else if (page === 'gamification') {
-                renderGamificationPage();
-            }
-        }
-
-        function toggleSidebar() {
-            document.querySelector('.sidebar').classList.toggle('show');
-        }
-
-        // Update week range
-        function updateWeekRange() {
-            const today = new Date();
-            const monday = new Date(today);
-            monday.setDate(today.getDate() - today.getDay() + 1);
-            const sunday = new Date(monday);
-            sunday.setDate(monday.getDate() + 6);
-            
-            const formatDate = (date) => {
-                return `${date.getDate()}.${date.getMonth() + 1}.${date.getFullYear()}`;
-            };
-            
-            document.getElementById('week-range').textContent = 
-                `${formatDate(monday)} - ${formatDate(sunday)}`;
-        }
-
-        // Highlight today
-        function highlightToday() {
-            const today = new Date().getDay();
-            const dayIndex = today === 0 ? 6 : today - 1; // Convert Sunday=0 to index 6
-            const dayIds = ['day-mon', 'day-tue', 'day-wed', 'day-thu', 'day-fri', 'day-sat', 'day-sun'];
-            
-            if (dayIndex >= 0 && dayIndex < dayIds.length) {
-                const todayHeader = document.getElementById(dayIds[dayIndex]);
-                if (todayHeader) {
-                    todayHeader.classList.add('today');
-                    todayHeader.innerHTML += ' <span style="font-size: 0.8rem;">📍 BUGÜN</span>';
-                }
-            }
-        }
-
-        // Dashboard
-        function updateDashboard() {
-            initializeLeaves();
-        updateBadges();
             document.getElementById('total-staff').textContent = staff.length;
             
             let totalShifts = 0;
@@ -2478,30 +2444,41 @@
                         // Atanan personeller
                         cellContent += '<div class="shift-assignments">';
                         
+                        
                         assignments.forEach((assignment, idx) => {
                             const s = staff.find(x => x.id === assignment.staffId);
                             if (!s) return;
                             
-                            // Çift pozisyon kontrolü
-                            let positions = assignment.positions || [assignment.position];
+                            // Çift pozisyon kontrolü - hem position hem positions destekle
+                            let positions = [];
+                            if (assignment.positions && Array.isArray(assignment.positions)) {
+                                positions = assignment.positions;
+                            } else if (assignment.position) {
+                                positions = [assignment.position];
+                            } else {
+                                return; // Pozisyon yok, atla
+                            }
+                            
                             let primaryPos = positions[0];
                             let color = positionColors[primaryPos] || '#666';
                             
                             let displayText = s.name;
                             if (positions.length > 1) {
-                                displayText += ` (${positions.map(p => positionEmojis[p]).join(' + ')})`;
+                                displayText += ` (${positions.map(p => positionEmojis[p] || '📦').join(' + ')})`;
                             } else {
-                                displayText += ` (${positionEmojis[primaryPos]} ${primaryPos})`;
+                                displayText += ` (${positionEmojis[primaryPos] || '📦'} ${primaryPos})`;
                             }
                             
+                            const isLightBg = primaryPos === 'Garson' || primaryPos === 'Restoran Garson';
+                            
                             cellContent += `
-                                <div class="assigned-staff" style="background: ${color}; color: ${primaryPos === 'Garson' || primaryPos === 'Restoran Garson' ? '#1a1a2e' : 'white'};" draggable="true" ondragstart="dragAssigned(event, '${day}', '${shiftId}', ${idx})">
+                                <div class="assigned-staff" style="background: ${color}; color: ${isLightBg ? '#1a1a2e' : 'white'};" draggable="true" ondragstart="dragAssigned(event, '${day}', '${shiftId}', ${idx})">
                                     <span>${displayText}</span>
                                     <button class="remove-btn" onclick="removeAssignment('${day}', '${shiftId}', ${idx})">×</button>
                                 </div>
                             `;
                         });
-                        
+
                         cellContent += '</div>';
                         
                         // İzinli personeller
@@ -2590,6 +2567,12 @@
         
         function drop(event, day, shiftId) {
             event.preventDefault();
+            
+            // Schedule güvenlik kontrolü
+            if (!schedule[day]) schedule[day] = {};
+            if (!schedule[day][shiftId]) schedule[day][shiftId] = [];
+            
+
             event.currentTarget.classList.remove('drag-over');
             
             const type = event.dataTransfer.getData('type');
@@ -2621,7 +2604,21 @@
                 schedule[day][shiftId].push(assignment);
                 
                 saveToStorage();
-                updateBadges();
+                
+        // Aktif vardiyaları başlat
+        if (!activeShifts || activeShifts.length === 0) {
+            activeShifts = ['morning', 'evening'];
+        }
+
+        // Schedule'ı tüm vardiyalar için başlat
+        days.forEach(day => {
+            if (!schedule[day]) schedule[day] = {};
+            shifts.forEach(shift => {
+                if (!schedule[day][shift.id]) schedule[day][shift.id] = [];
+            });
+        });
+
+        updateBadges();
                 renderSchedule();
                 showAlert('Vardiya taşındı', 'success');
                 return;
@@ -2643,7 +2640,21 @@
                 if (!existing.positions.includes(newPosition)) {
                     existing.positions.push(newPosition);
                     saveToStorage();
-                    updateBadges();
+                    
+        // Aktif vardiyaları başlat
+        if (!activeShifts || activeShifts.length === 0) {
+            activeShifts = ['morning', 'evening'];
+        }
+
+        // Schedule'ı tüm vardiyalar için başlat
+        days.forEach(day => {
+            if (!schedule[day]) schedule[day] = {};
+            shifts.forEach(shift => {
+                if (!schedule[day][shift.id]) schedule[day][shift.id] = [];
+            });
+        });
+
+        updateBadges();
                     renderSchedule();
                     showAlert(`İkinci pozisyon eklendi: ${newPosition} (Saat değişmedi)`, 'success');
                 } else {
@@ -2669,7 +2680,21 @@
             schedule[day][shiftId].push({ staffId, position });
             
             saveToStorage();
-            updateBadges();
+            
+        // Aktif vardiyaları başlat
+        if (!activeShifts || activeShifts.length === 0) {
+            activeShifts = ['morning', 'evening'];
+        }
+
+        // Schedule'ı tüm vardiyalar için başlat
+        days.forEach(day => {
+            if (!schedule[day]) schedule[day] = {};
+            shifts.forEach(shift => {
+                if (!schedule[day][shift.id]) schedule[day][shift.id] = [];
+            });
+        });
+
+        updateBadges();
             renderSchedule();
             showAlert('Vardiya atandı', 'success');
         }
@@ -2753,6 +2778,20 @@
         renderLeaveSummary();
             updateDashboard();
             initializeLeaves();
+        
+        // Aktif vardiyaları başlat
+        if (!activeShifts || activeShifts.length === 0) {
+            activeShifts = ['morning', 'evening'];
+        }
+
+        // Schedule'ı tüm vardiyalar için başlat
+        days.forEach(day => {
+            if (!schedule[day]) schedule[day] = {};
+            shifts.forEach(shift => {
+                if (!schedule[day][shift.id]) schedule[day][shift.id] = [];
+            });
+        });
+
         updateBadges();
             showAlert('Atama kaldırıldı', 'success');
         }
@@ -3141,6 +3180,20 @@
 
         function renderGamificationPage() {
             initializeLeaves();
+        
+        // Aktif vardiyaları başlat
+        if (!activeShifts || activeShifts.length === 0) {
+            activeShifts = ['morning', 'evening'];
+        }
+
+        // Schedule'ı tüm vardiyalar için başlat
+        days.forEach(day => {
+            if (!schedule[day]) schedule[day] = {};
+            shifts.forEach(shift => {
+                if (!schedule[day][shift.id]) schedule[day][shift.id] = [];
+            });
+        });
+
         updateBadges();
             renderLeaderboard();
             renderAllBadges();
