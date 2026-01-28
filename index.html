@@ -1,3 +1,1869 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rumeli İskelesi Personel Yönetimi</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #1a1a2e;
+            --bg-secondary: #16213e;
+            --bg-tertiary: #0f3460;
+            --text-primary: #eaeaea;
+            --text-secondary: #a0a0a0;
+            --accent: #e94560;
+            --border: #2a2a4a;
+            --izgara: #ff6b6b;
+            --mutfak: #51cf66;
+            --ocak: #ff922b;
+            --kasiyer: #339af0;
+            --garson: #ffd43b;
+            --temizlik: #9775fa;
+            --success: #51cf66;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 260px;
+            background: var(--bg-secondary);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            height: 100vh;
+            z-index: 100;
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar-header {
+            padding: 24px 20px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .sidebar-header h1 {
+            font-size: 1.3rem;
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sidebar-header h1::before {
+            content: "🍽️";
+        }
+
+        .nav-menu {
+            padding: 16px 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            flex: 1;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 16px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .nav-item:hover {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+
+        .nav-item.active {
+            background: var(--accent);
+            color: white;
+        }
+
+        .nav-item i {
+            font-size: 1.2rem;
+            width: 24px;
+            text-align: center;
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            position: fixed;
+            top: 16px;
+            left: 16px;
+            z-index: 101;
+            background: var(--accent);
+            color: white;
+            border: none;
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            font-size: 1.3rem;
+            cursor: pointer;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 260px;
+            padding: 24px;
+            min-height: 100vh;
+        }
+
+        .page-header {
+            margin-bottom: 24px;
+        }
+
+        .page-header h2 {
+            font-size: 1.8rem;
+            margin-bottom: 8px;
+        }
+
+        .page-header p {
+            color: var(--text-secondary);
+        }
+
+        /* Cards */
+        .card {
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid var(--border);
+            margin-bottom: 20px;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .stat-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.6rem;
+        }
+
+        .stat-icon.blue { background: rgba(51, 154, 240, 0.15); }
+        .stat-icon.green { background: rgba(81, 207, 102, 0.15); }
+        .stat-icon.orange { background: rgba(255, 146, 43, 0.15); }
+        .stat-icon.purple { background: rgba(151, 117, 250, 0.15); }
+
+        .stat-info h3 {
+            font-size: 1.8rem;
+            margin-bottom: 4px;
+        }
+
+        .stat-info p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 10px 20px;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #d63d54;
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+
+        .btn-secondary:hover {
+            background: #1a4d7f;
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #3fb950;
+        }
+
+        /* Staff Grid */
+        .staff-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 16px;
+        }
+
+        .staff-card {
+            background: var(--bg-tertiary);
+            border-radius: 12px;
+            padding: 16px;
+            border: 1px solid var(--border);
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .staff-card:hover {
+            transform: translateY(-2px);
+            border-color: var(--accent);
+        }
+
+        .staff-card.manager {
+            border: 2px solid #ffd700;
+        }
+
+        .staff-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+
+        .staff-name {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .role-badge {
+            font-size: 0.75rem;
+            padding: 3px 8px;
+            border-radius: 6px;
+            background: var(--accent);
+            color: white;
+        }
+
+        .part-time-badge {
+            font-size: 0.75rem;
+            padding: 3px 8px;
+            border-radius: 6px;
+            background: var(--ocak);
+            color: white;
+        }
+
+        .positions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 8px;
+        }
+
+        .position-tag {
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .position-tag.izgara { background: var(--izgara); color: white; }
+        .position-tag.mutfak { background: var(--mutfak); color: white; }
+        .position-tag.ocak { background: var(--ocak); color: white; }
+        .position-tag.kasiyer { background: var(--kasiyer); color: white; }
+        .position-tag.garson { background: var(--garson); color: #1a1a2e; }
+        .position-tag.temizlik { background: var(--temizlik); color: white; }
+
+        .staff-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .icon-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            transition: all 0.2s ease;
+        }
+
+        .icon-btn.edit {
+            background: var(--kasiyer);
+            color: white;
+        }
+
+        .icon-btn.delete {
+            background: var(--accent);
+            color: white;
+        }
+
+        /* Schedule Table */
+        .schedule-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .schedule-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .schedule-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            background: var(--bg-tertiary);
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 24px;
+        }
+
+        .schedule-table th {
+            background: var(--bg-secondary);
+            padding: 16px 12px;
+            text-align: center;
+            border-bottom: 2px solid var(--border);
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .schedule-table th.today {
+            background: rgba(81, 207, 102, 0.2);
+            border-left: 3px solid var(--success);
+            border-right: 3px solid var(--success);
+        }
+
+        .schedule-table td {
+            padding: 12px;
+            border-bottom: 1px solid var(--border);
+            border-right: 1px solid var(--border);
+            vertical-align: top;
+            min-height: 100px;
+        }
+
+        .schedule-table td:last-child {
+            border-right: none;
+        }
+
+        .shift-label {
+            font-weight: 600;
+            font-size: 0.95rem;
+            white-space: nowrap;
+            text-align: center;
+        }
+
+        .shift-cell {
+            min-height: 120px;
+            background: var(--bg-secondary);
+            transition: all 0.2s ease;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .shift-cell.empty {
+            border: 2px dashed #475569;
+        }
+
+        .shift-cell.empty:hover {
+            background: var(--bg-tertiary);
+            border-color: var(--accent);
+        }
+
+        .shift-cell.empty::before {
+            content: "➕ Personel Ekle";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #94a3b8;
+            font-style: italic;
+            font-size: 0.85rem;
+            opacity: 0.6;
+        }
+
+        .shift-cell.drag-over {
+            background: rgba(233, 69, 96, 0.1);
+            border: 2px solid var(--accent);
+        }
+
+        .shift-count {
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            background: rgba(148, 163, 184, 0.3);
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            color: #94a3b8;
+            display: flex;
+            align-items: center;
+            gap: 3px;
+        }
+
+        .shift-assignments {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            padding-top: 20px;
+        }
+
+        .assigned-staff {
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: move;
+            transition: all 0.2s ease;
+        }
+
+        .assigned-staff:hover {
+            transform: translateX(2px);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+
+        .assigned-staff.dragging {
+            opacity: 0.5;
+        }
+
+        .remove-btn {
+            background: rgba(0, 0, 0, 0.3);
+            border: none;
+            color: white;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1rem;
+            line-height: 1;
+            transition: all 0.2s ease;
+        }
+
+        .remove-btn:hover {
+            background: rgba(0, 0, 0, 0.6);
+            transform: scale(1.1);
+        }
+
+        /* Staff Pool */
+        .staff-pool-container {
+            background: var(--bg-tertiary);
+            border-radius: 12px;
+            padding: 16px;
+            border: 1px solid var(--border);
+        }
+
+        .pool-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .pool-title {
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .filter-buttons {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
+        }
+
+        .filter-btn {
+            padding: 6px 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: var(--bg-secondary);
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.2s ease;
+        }
+
+        .filter-btn:hover {
+            background: var(--bg-tertiary);
+        }
+
+        .filter-btn.active {
+            border-color: var(--accent);
+            background: var(--accent);
+            color: white;
+        }
+
+        .staff-pool {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 10px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .pool-item {
+            background: var(--bg-secondary);
+            padding: 10px 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            cursor: move;
+            transition: all 0.2s ease;
+        }
+
+        .pool-item:hover {
+            background: var(--bg-tertiary);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .pool-item.dragging {
+            opacity: 0.5;
+        }
+
+        .pool-item > div:first-child {
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+
+        .pool-item .positions {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-top: 0;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(4px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+        }
+
+        .modal {
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            padding: 24px;
+            max-width: 500px;
+            width: 90%;
+            border: 1px solid var(--border);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 1.5rem;
+            cursor: pointer;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .close-btn:hover {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 10px 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            font-size: 0.95rem;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .checkbox-group {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px;
+            border-radius: 8px;
+            background: var(--bg-tertiary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .checkbox-label:hover {
+            background: var(--bg-primary);
+        }
+
+        .checkbox-label input[type="checkbox"] {
+            width: auto;
+            cursor: pointer;
+        }
+
+        .search-box {
+            width: 100%;
+            padding: 10px 12px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            margin-bottom: 20px;
+        }
+
+        .search-box:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        /* Alert */
+        .alert {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 16px 20px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 500;
+            z-index: 2000;
+            opacity: 0;
+            transform: translateY(-20px);
+            transition: all 0.3s ease;
+        }
+
+        .alert.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .alert.error {
+            background: var(--accent);
+            color: white;
+        }
+
+        .alert.success {
+            background: var(--mutfak);
+            color: white;
+        }
+
+        /* Dashboard enhancements */
+        .chart-card {
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid var(--border);
+            margin-bottom: 20px;
+        }
+
+        .bar-chart {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-around;
+            height: 200px;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .bar-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .bar {
+            width: 100%;
+            background: var(--bg-tertiary);
+            border-radius: 8px 8px 0 0;
+            position: relative;
+            transition: all 0.3s ease;
+            min-height: 20px;
+        }
+
+        .bar:hover {
+            opacity: 0.8;
+        }
+
+        .bar.today {
+            background: var(--success);
+        }
+
+        .bar-value {
+            position: absolute;
+            top: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .bar-label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .top-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .top-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: var(--bg-tertiary);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .top-item:hover {
+            background: var(--bg-primary);
+            transform: translateX(4px);
+        }
+
+        .top-rank {
+            font-size: 1.5rem;
+        }
+
+        .top-info {
+            flex: 1;
+        }
+
+        .top-name {
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .top-shifts {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .empty-list {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        .idle-staff-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .idle-staff-item {
+            padding: 10px 12px;
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .idle-name {
+            font-weight: 500;
+        }
+
+        .idle-positions {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .weekly-summary {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .summary-item {
+            padding: 12px;
+            background: var(--bg-tertiary);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .summary-icon {
+            font-size: 1.5rem;
+        }
+
+        .summary-info {
+            flex: 1;
+        }
+
+        .summary-value {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .summary-label {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        /* Toast notification for WhatsApp export */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 16px 24px;
+            background: var(--success);
+            color: white;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 500;
+            z-index: 2000;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.show {
+                transform: translateX(0);
+            }
+
+            .mobile-menu-btn {
+                display: flex;
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 70px 16px 16px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .staff-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .schedule-table {
+                font-size: 0.85rem;
+            }
+
+            .schedule-table th,
+            .schedule-table td {
+                padding: 8px 6px;
+            }
+
+            .staff-pool {
+                grid-template-columns: 1fr;
+            }
+
+            .checkbox-group {
+                grid-template-columns: 1fr;
+            }
+
+            .schedule-controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .schedule-actions {
+                flex-direction: column;
+            }
+
+            .weekly-summary {
+                grid-template-columns: 1fr;
+            }
+
+            .bar-chart {
+                height: 150px;
+                gap: 6px;
+            }
+        }
+
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <button class="mobile-menu-btn" onclick="toggleSidebar()">☰</button>
+    
+    <div class="container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h1>Rumeli İskelesi</h1>
+            </div>
+            <nav class="nav-menu">
+                <div class="nav-item active" onclick="showPage('dashboard')">
+                    <i>📊</i>
+                    <span>Dashboard</span>
+                </div>
+                <div class="nav-item" onclick="showPage('staff')">
+                    <i>👥</i>
+                    <span>Personel Listesi</span>
+                </div>
+                <div class="nav-item" onclick="showPage('schedule')">
+                    <i>📅</i>
+                    <span>Vardiya Planı</span>
+                </div>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <!-- Dashboard Page -->
+            <div id="dashboard-page" class="page active">
+                <div class="page-header">
+                    <h2>Dashboard</h2>
+                    <p>Restoran personel yönetimine hoş geldiniz</p>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon blue">👥</div>
+                        <div class="stat-info">
+                            <h3 id="total-staff">15</h3>
+                            <p>Toplam Personel</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon green">✅</div>
+                        <div class="stat-info">
+                            <h3 id="assigned-shifts">0</h3>
+                            <p>Atanan Vardiya</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon orange">📦</div>
+                        <div class="stat-info">
+                            <h3 id="total-positions">6</h3>
+                            <p>Pozisyon</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon purple">👔</div>
+                        <div class="stat-info">
+                            <h3 id="weekly-coverage">0%</h3>
+                            <p>Haftalık Kapsama</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bar Chart -->
+                <div class="chart-card">
+                    <div class="card-title">📊 Son 7 Gün Vardiya Dağılımı</div>
+                    <div class="bar-chart" id="bar-chart">
+                        <!-- Generated by JS -->
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+                    <!-- Top 3 Workers -->
+                    <div class="chart-card">
+                        <div class="card-title">🏆 Bu Hafta En Çok Çalışanlar</div>
+                        <div class="top-list" id="top-workers">
+                            <!-- Generated by JS -->
+                        </div>
+                    </div>
+
+                    <!-- Idle Staff -->
+                    <div class="chart-card">
+                        <div class="card-title">😴 Bu Hafta Boş Personeller</div>
+                        <div class="idle-staff-list" id="idle-staff">
+                            <!-- Generated by JS -->
+                        </div>
+                    </div>
+
+                    <!-- Weekly Summary -->
+                    <div class="chart-card">
+                        <div class="card-title">📈 Haftalık Özet</div>
+                        <div class="weekly-summary" id="weekly-summary">
+                            <!-- Generated by JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">Pozisyon Dağılımı</div>
+                    <div id="position-summary" style="margin-top: 12px;">
+                        <!-- Generated by JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Staff Page -->
+            <div id="staff-page" class="page">
+                <div class="page-header">
+                    <h2>Personel Listesi</h2>
+                    <p>Restoran personelinizi yönetin</p>
+                </div>
+
+                <input type="text" class="search-box" id="staff-search" placeholder="🔍 Personel ara..." oninput="filterStaff()">
+
+                <button class="btn btn-primary" onclick="openStaffModal()" style="margin-bottom: 20px;">
+                    ➕ Yeni Personel Ekle
+                </button>
+
+                <div class="staff-grid" id="staff-list">
+                    <!-- Generated by JS -->
+                </div>
+            </div>
+
+            <!-- Schedule Page -->
+            <div id="schedule-page" class="page">
+                <div class="page-header">
+                    <h2>Haftalık Vardiya Planı</h2>
+                    <p>Personel vardiya atamalarını düzenleyin</p>
+                </div>
+
+                <div class="schedule-controls">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <span style="font-weight: 600;">Bu Hafta</span>
+                        <span style="color: var(--text-secondary); font-size: 0.9rem;" id="week-range"></span>
+                    </div>
+                    <div class="schedule-actions">
+                        <button class="btn btn-success" onclick="exportToWhatsApp()">📱 WhatsApp'a Gönder</button>
+                        <button class="btn btn-secondary" onclick="copyWeek()">🔄 Bu Haftayı Kopyala</button>
+                        <button class="btn btn-secondary" onclick="clearWeek()">🗑️ Bu Haftayı Temizle</button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div style="color: var(--text-secondary); margin-bottom: 16px; display: flex; gap: 16px; flex-wrap: wrap; align-items: center;">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <div style="width: 16px; height: 16px; background: var(--izgara); border-radius: 4px;"></div>
+                            <span>🔥 Izgara</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <div style="width: 16px; height: 16px; background: var(--mutfak); border-radius: 4px;"></div>
+                            <span>👨‍🍳 Mutfak</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <div style="width: 16px; height: 16px; background: var(--ocak); border-radius: 4px;"></div>
+                            <span>🍳 Ocak</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <div style="width: 16px; height: 16px; background: var(--kasiyer); border-radius: 4px;"></div>
+                            <span>💰 Kasiyer</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <div style="width: 16px; height: 16px; background: var(--garson); border-radius: 4px;"></div>
+                            <span>🍽️ Garson</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <div style="width: 16px; height: 16px; background: var(--temizlik); border-radius: 4px;"></div>
+                            <span>🧹 Temizlik</span>
+                        </div>
+                    </div>
+                    
+                    <table class="schedule-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 120px;">Vardiya</th>
+                                <th id="day-mon">Pazartesi</th>
+                                <th id="day-tue">Salı</th>
+                                <th id="day-wed">Çarşamba</th>
+                                <th id="day-thu">Perşembe</th>
+                                <th id="day-fri">Cuma</th>
+                                <th id="day-sat">Cumartesi</th>
+                                <th id="day-sun">Pazar</th>
+                            </tr>
+                        </thead>
+                        <tbody id="schedule-body">
+                            <!-- Generated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="staff-pool-container">
+                    <div class="pool-header">
+                        <div class="pool-title">Müsait Personel (Sürükle-Bırak)</div>
+                    </div>
+                    <div class="filter-buttons">
+                        <button class="filter-btn active" onclick="filterPool('all')">Tümü</button>
+                        <button class="filter-btn" onclick="filterPool('Izgara')">🔥 Izgara</button>
+                        <button class="filter-btn" onclick="filterPool('Mutfak')">👨‍🍳 Mutfak</button>
+                        <button class="filter-btn" onclick="filterPool('Ocak')">🍳 Ocak</button>
+                        <button class="filter-btn" onclick="filterPool('Kasiyer')">💰 Kasiyer</button>
+                        <button class="filter-btn" onclick="filterPool('Garson')">🍽️ Garson</button>
+                        <button class="filter-btn" onclick="filterPool('Temizlik')">🧹 Temizlik</button>
+                    </div>
+                    <div class="staff-pool" id="staff-pool">
+                        <!-- Generated by JS -->
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Staff Modal -->
+    <div class="modal-overlay" id="staff-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title" id="modal-title">Yeni Personel Ekle</div>
+                <button class="close-btn" onclick="closeStaffModal()">×</button>
+            </div>
+            <form onsubmit="saveStaff(event)">
+                <div class="form-group">
+                    <label>İsim</label>
+                    <input type="text" id="staff-name" required>
+                </div>
+                <div class="form-group">
+                    <label>Pozisyonlar</label>
+                    <div class="checkbox-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="position" value="Izgara"> 🔥 Izgara
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="position" value="Mutfak"> 👨‍🍳 Mutfak
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="position" value="Ocak"> 🍳 Ocak
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="position" value="Kasiyer"> 💰 Kasiyer
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="position" value="Garson"> 🍽️ Garson
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="position" value="Temizlik"> 🧹 Temizlik
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Özel Rol (Opsiyonel)</label>
+                    <select id="staff-role">
+                        <option value="">Yok</option>
+                        <option value="Mesul Müdür">👑 Mesul Müdür</option>
+                        <option value="Part-time">⏰ Part-time</option>
+                    </select>
+                </div>
+                <div style="display: flex; gap: 12px; margin-top: 20px;">
+                    <button type="submit" class="btn btn-primary" style="flex: 1;">Kaydet</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeStaffModal()">İptal</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Alert -->
+    <div class="alert" id="alert">
+        <span id="alert-icon">⚠️</span>
+        <span id="alert-message"></span>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast">
+        <span>✅</span>
+        <span id="toast-message"></span>
+    </div>
+
+    <script>
+        // Initial Data
+        let staff = [
+            { id: 1, name: "Metehan Arslan", positions: [], role: "Mesul Müdür" },
+            { id: 2, name: "Halime Göksü", positions: ["Izgara", "Mutfak", "Ocak"], role: "" },
+            { id: 3, name: "Gizem Erdoğdu", positions: ["Mutfak", "Ocak", "Kasiyer"], role: "" },
+            { id: 4, name: "Batuhan Buyral", positions: ["Mutfak", "Ocak", "Kasiyer", "Garson"], role: "" },
+            { id: 5, name: "Halil İbrahim Uzun", positions: ["Izgara", "Mutfak", "Ocak", "Garson"], role: "" },
+            { id: 6, name: "Hava Akyüz", positions: ["Izgara", "Mutfak", "Ocak"], role: "" },
+            { id: 7, name: "Mine Pehlivanoğlu", positions: ["Mutfak"], role: "" },
+            { id: 8, name: "Melda Yılmaz", positions: ["Kasiyer", "Garson"], role: "" },
+            { id: 9, name: "Ceren Erdem", positions: ["Kasiyer", "Garson"], role: "" },
+            { id: 10, name: "Elif Yıldırım", positions: ["Kasiyer", "Garson"], role: "" },
+            { id: 11, name: "Tuba Bozaklı", positions: ["Kasiyer", "Garson"], role: "" },
+            { id: 12, name: "Emircan Biçer", positions: ["Garson"], role: "" },
+            { id: 13, name: "Burak Sancar", positions: ["Garson"], role: "" },
+            { id: 14, name: "Nesrin Karadeniz", positions: ["Temizlik"], role: "" },
+            { id: 15, name: "Şiyar Onğulu", positions: ["Garson"], role: "Part-time" }
+        ];
+
+        const days = ['Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi', 'Pazar'];
+        const shifts = [
+            { id: 'morning', name: 'Sabah', time: '🌅 08:00-16:00' },
+            { id: 'afternoon', name: 'Öğle', time: '🌆 12:00-20:00' },
+            { id: 'evening', name: 'Akşam', time: '🌙 16:00-24:00' }
+        ];
+
+        const positionColors = {
+            'Izgara': '#ff6b6b',
+            'Mutfak': '#51cf66',
+            'Ocak': '#ff922b',
+            'Kasiyer': '#339af0',
+            'Garson': '#ffd43b',
+            'Temizlik': '#9775fa'
+        };
+
+        const positionEmojis = {
+            'Izgara': '🔥',
+            'Mutfak': '👨‍🍳',
+            'Ocak': '🍳',
+            'Kasiyer': '💰',
+            'Garson': '🍽️',
+            'Temizlik': '🧹'
+        };
+
+        let schedule = {};
+        let currentPoolFilter = 'all';
+        let editingStaffId = null;
+
+        // Initialize schedule
+        days.forEach(day => {
+            schedule[day] = {};
+            shifts.forEach(shift => {
+                schedule[day][shift.id] = [];
+            });
+        });
+
+        // Load from localStorage
+        function loadFromStorage() {
+            const savedStaff = localStorage.getItem('staff');
+            const savedSchedule = localStorage.getItem('schedule');
+            
+            if (savedStaff) {
+                staff = JSON.parse(savedStaff);
+            }
+            
+            if (savedSchedule) {
+                schedule = JSON.parse(savedSchedule);
+            }
+        }
+
+        // Save to localStorage
+        function saveToStorage() {
+            localStorage.setItem('staff', JSON.stringify(staff));
+            localStorage.setItem('schedule', JSON.stringify(schedule));
+        }
+
+        // Initialize
+        loadFromStorage();
+        updateDashboard();
+        renderStaffList();
+        renderSchedule();
+        renderStaffPool();
+        updateWeekRange();
+        highlightToday();
+
+        // Navigation
+        function showPage(page) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            
+            document.getElementById(page + '-page').classList.add('active');
+            event.target.closest('.nav-item').classList.add('active');
+            
+            if (page === 'schedule') {
+                renderSchedule();
+                renderStaffPool();
+            }
+        }
+
+        function toggleSidebar() {
+            document.querySelector('.sidebar').classList.toggle('show');
+        }
+
+        // Update week range
+        function updateWeekRange() {
+            const today = new Date();
+            const monday = new Date(today);
+            monday.setDate(today.getDate() - today.getDay() + 1);
+            const sunday = new Date(monday);
+            sunday.setDate(monday.getDate() + 6);
+            
+            const formatDate = (date) => {
+                return `${date.getDate()}.${date.getMonth() + 1}.${date.getFullYear()}`;
+            };
+            
+            document.getElementById('week-range').textContent = 
+                `${formatDate(monday)} - ${formatDate(sunday)}`;
+        }
+
+        // Highlight today
+        function highlightToday() {
+            const today = new Date().getDay();
+            const dayIndex = today === 0 ? 6 : today - 1; // Convert Sunday=0 to index 6
+            const dayIds = ['day-mon', 'day-tue', 'day-wed', 'day-thu', 'day-fri', 'day-sat', 'day-sun'];
+            
+            if (dayIndex >= 0 && dayIndex < dayIds.length) {
+                const todayHeader = document.getElementById(dayIds[dayIndex]);
+                if (todayHeader) {
+                    todayHeader.classList.add('today');
+                    todayHeader.innerHTML += ' <span style="font-size: 0.8rem;">📍 BUGÜN</span>';
+                }
+            }
+        }
+
+        // Dashboard
+        function updateDashboard() {
+            document.getElementById('total-staff').textContent = staff.length;
+            
+            let totalShifts = 0;
+            days.forEach(day => {
+                shifts.forEach(shift => {
+                    totalShifts += schedule[day][shift.id].length;
+                });
+            });
+            document.getElementById('assigned-shifts').textContent = totalShifts;
+            
+            const totalSlots = days.length * shifts.length;
+            const coverage = totalSlots > 0 ? Math.round((totalShifts / totalSlots) * 100) : 0;
+            document.getElementById('weekly-coverage').textContent = coverage + '%';
+            
+            updateBarChart();
+            updateTopWorkers();
+            updateIdleStaff();
+            updateWeeklySummary();
+            updatePositionSummary();
+        }
+
+        function updateBarChart() {
+            const chart = document.getElementById('bar-chart');
+            const todayIndex = new Date().getDay() === 0 ? 6 : new Date().getDay() - 1;
+            
+            let html = '';
+            days.forEach((day, index) => {
+                let count = 0;
+                shifts.forEach(shift => {
+                    count += schedule[day][shift.id].length;
+                });
+                
+                const maxCount = 20; // Max expected assignments per day
+                const height = count > 0 ? (count / maxCount) * 100 : 10;
+                const isToday = index === todayIndex;
+                
+                html += `
+                    <div class="bar-item">
+                        <div class="bar ${isToday ? 'today' : ''}" style="height: ${height}%;">
+                            <div class="bar-value">${count}</div>
+                        </div>
+                        <div class="bar-label">${day.substring(0, 3)}</div>
+                    </div>
+                `;
+            });
+            
+            chart.innerHTML = html;
+        }
+
+        function updateTopWorkers() {
+            const container = document.getElementById('top-workers');
+            const staffShifts = {};
+            
+            staff.forEach(s => {
+                staffShifts[s.id] = 0;
+            });
+            
+            days.forEach(day => {
+                shifts.forEach(shift => {
+                    schedule[day][shift.id].forEach(assignment => {
+                        staffShifts[assignment.staffId]++;
+                    });
+                });
+            });
+            
+            const sorted = Object.entries(staffShifts)
+                .map(([id, count]) => ({
+                    staff: staff.find(s => s.id === parseInt(id)),
+                    count
+                }))
+                .filter(item => item.count > 0)
+                .sort((a, b) => b.count - a.count)
+                .slice(0, 3);
+            
+            if (sorted.length === 0) {
+                container.innerHTML = '<div class="empty-list">Henüz vardiya atanmamış</div>';
+                return;
+            }
+            
+            const medals = ['🥇', '🥈', '🥉'];
+            container.innerHTML = sorted.map((item, index) => `
+                <div class="top-item" onclick="showPage('staff')">
+                    <div class="top-rank">${medals[index]}</div>
+                    <div class="top-info">
+                        <div class="top-name">${item.staff.name}</div>
+                        <div class="top-shifts">${item.count} vardiya</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function updateIdleStaff() {
+            const container = document.getElementById('idle-staff');
+            const assignedStaffIds = new Set();
+            
+            days.forEach(day => {
+                shifts.forEach(shift => {
+                    schedule[day][shift.id].forEach(assignment => {
+                        assignedStaffIds.add(assignment.staffId);
+                    });
+                });
+            });
+            
+            const idleStaff = staff.filter(s => !assignedStaffIds.has(s.id));
+            
+            if (idleStaff.length === 0) {
+                container.innerHTML = '<div class="empty-list">✅ Tüm personel vardiyalı!</div>';
+                return;
+            }
+            
+            const displayCount = 5;
+            const displayed = idleStaff.slice(0, displayCount);
+            const remaining = idleStaff.length - displayCount;
+            
+            let html = displayed.map(s => {
+                const positions = s.role === "Mesul Müdür" ? "Mesul Müdür" : s.positions.join(', ');
+                return `
+                    <div class="idle-staff-item">
+                        <span class="idle-name">${s.name}</span>
+                        <span class="idle-positions">${positions}</span>
+                    </div>
+                `;
+            }).join('');
+            
+            if (remaining > 0) {
+                html += `<div class="idle-staff-item" style="color: var(--text-secondary); font-style: italic;">...ve ${remaining} kişi daha</div>`;
+            }
+            
+            container.innerHTML = html;
+        }
+
+        function updateWeeklySummary() {
+            const container = document.getElementById('weekly-summary');
+            
+            let totalAssignments = 0;
+            let emptySlots = 0;
+            
+            days.forEach(day => {
+                shifts.forEach(shift => {
+                    const count = schedule[day][shift.id].length;
+                    totalAssignments += count;
+                    if (count === 0) emptySlots++;
+                });
+            });
+            
+            const totalHours = totalAssignments * 8; // Each shift is 8 hours
+            const avgPerShift = totalAssignments > 0 ? (totalAssignments / (days.length * shifts.length)).toFixed(1) : 0;
+            
+            container.innerHTML = `
+                <div class="summary-item">
+                    <div class="summary-icon">📅</div>
+                    <div class="summary-info">
+                        <div class="summary-value">${totalAssignments}</div>
+                        <div class="summary-label">Atanan Vardiya</div>
+                    </div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-icon">⏰</div>
+                    <div class="summary-info">
+                        <div class="summary-value">${totalHours}</div>
+                        <div class="summary-label">Toplam Saat</div>
+                    </div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-icon">👥</div>
+                    <div class="summary-info">
+                        <div class="summary-value">${avgPerShift}</div>
+                        <div class="summary-label">Ort. Personel</div>
+                    </div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-icon">❌</div>
+                    <div class="summary-info">
+                        <div class="summary-value">${emptySlots}</div>
+                        <div class="summary-label">Boş Vardiya</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function updatePositionSummary() {
+            const container = document.getElementById('position-summary');
+            const positionCounts = {};
+            
+            days.forEach(day => {
+                shifts.forEach(shift => {
+                    schedule[day][shift.id].forEach(assignment => {
+                        positionCounts[assignment.position] = (positionCounts[assignment.position] || 0) + 1;
+                    });
+                });
+            });
+            
+            const sorted = Object.entries(positionCounts)
+                .sort((a, b) => b[1] - a[1]);
+            
+            if (sorted.length === 0) {
+                container.innerHTML = '<div style="color: var(--text-secondary); font-style: italic;">Henüz vardiya atanmamış</div>';
+                return;
+            }
+            
+            container.innerHTML = sorted.map(([position, count]) => `
+                <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border);">
+                    <span>${positionEmojis[position]} ${position}</span>
+                    <span style="font-weight: 600;">${count} vardiya</span>
+                </div>
+            `).join('');
+        }
+
+        // Staff Management
+        function renderStaffList() {
+            const container = document.getElementById('staff-list');
+            const searchTerm = document.getElementById('staff-search')?.value.toLowerCase() || '';
+            
+            const filtered = staff.filter(s => 
+                s.name.toLowerCase().includes(searchTerm)
+            );
+            
+            container.innerHTML = filtered.map(s => {
+                const isManager = s.role === "Mesul Müdür";
+                const isPartTime = s.role === "Part-time";
+                const positionTags = s.positions.map(p => 
+                    `<div class="position-tag ${p.toLowerCase()}">${positionEmojis[p]} ${p}</div>`
+                ).join('');
+                
+                return `
+                    <div class="staff-card ${isManager ? 'manager' : ''}">
+                        <div class="staff-header">
+                            <div>
+                                <div class="staff-name">
+                                    ${isManager ? '👑 ' : ''}
+                                    ${s.name}
+                                    ${isPartTime ? ' <span class="part-time-badge">⏰ Part-time</span>' : ''}
+                                </div>
+                                ${isManager ? '<div class="role-badge">Mesul Müdür</div>' : ''}
+                            </div>
+                            <div class="staff-actions">
+                                <button class="icon-btn edit" onclick="editStaff(${s.id})">✏️</button>
+                                <button class="icon-btn delete" onclick="deleteStaff(${s.id})">🗑️</button>
+                            </div>
+                        </div>
+                        <div class="positions">
+                            ${isManager ? '<div class="position-tag" style="background: #ffd700; color: #1a1a2e;">👑 Tüm Pozisyonlar</div>' : positionTags}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function filterStaff() {
+            renderStaffList();
+        }
+
+        function openStaffModal() {
+            editingStaffId = null;
+            document.getElementById('modal-title').textContent = 'Yeni Personel Ekle';
+            document.getElementById('staff-name').value = '';
+            document.getElementById('staff-role').value = '';
+            document.querySelectorAll('input[name="position"]').forEach(cb => cb.checked = false);
+            document.getElementById('staff-modal').classList.add('show');
+        }
+
+        function closeStaffModal() {
+            document.getElementById('staff-modal').classList.remove('show');
+        }
+
+        function editStaff(id) {
+            const s = staff.find(x => x.id === id);
+            if (!s) return;
+            
+            editingStaffId = id;
+            document.getElementById('modal-title').textContent = 'Personel Düzenle';
+            document.getElementById('staff-name').value = s.name;
+            document.getElementById('staff-role').value = s.role || '';
+            
+            document.querySelectorAll('input[name="position"]').forEach(cb => {
+                cb.checked = s.positions.includes(cb.value);
+            });
+            
+            document.getElementById('staff-modal').classList.add('show');
+        }
+
+        function deleteStaff(id) {
+            if (!confirm('Bu personeli silmek istediğinizden emin misiniz?')) return;
+            
+            staff = staff.filter(s => s.id !== id);
+            
+            // Remove from schedule
+            days.forEach(day => {
+                shifts.forEach(shift => {
+                    schedule[day][shift.id] = schedule[day][shift.id].filter(a => a.staffId !== id);
+                });
+            });
+            
+            saveToStorage();
+            renderStaffList();
+            renderSchedule();
+            updateDashboard();
+            showAlert('Personel silindi', 'success');
+        }
+
+        function saveStaff(event) {
+            event.preventDefault();
+            
+            const name = document.getElementById('staff-name').value.trim();
+            const role = document.getElementById('staff-role').value;
+            const positions = Array.from(document.querySelectorAll('input[name="position"]:checked'))
+                .map(cb => cb.value);
+            
+            if (!name) {
+                showAlert('Lütfen isim girin', 'error');
+                return;
+            }
+            
+            if (role !== "Mesul Müdür" && positions.length === 0) {
+                showAlert('Lütfen en az bir pozisyon seçin', 'error');
+                return;
+            }
+            
+            if (editingStaffId) {
+                const s = staff.find(x => x.id === editingStaffId);
+                s.name = name;
+                s.positions = positions;
+                s.role = role;
+                showAlert('Personel güncellendi', 'success');
+            } else {
+                const newId = Math.max(...staff.map(s => s.id), 0) + 1;
+                staff.push({ id: newId, name, positions, role });
+                showAlert('Personel eklendi', 'success');
+            }
+            
+            saveToStorage();
+            renderStaffList();
+            renderStaffPool();
+            closeStaffModal();
+            updateDashboard();
+        }
+
+        // Schedule
+        function renderSchedule() {
+            const tbody = document.getElementById('schedule-body');
+            
+            tbody.innerHTML = shifts.map(shift => `
+                <tr>
+                    <td class="shift-label">
+                        <div style="font-weight: 600;">${shift.name}</div>
+                        <div style="font-size: 0.75rem; color: var(--text-secondary);">${shift.time}</div>
+                    </td>
+                    ${days.map(day => {
+                        const assignments = schedule[day][shift.id];
+                        const isEmpty = assignments.length === 0;
+                        
+                        return `
+                            <td class="shift-cell ${isEmpty ? 'empty' : ''}" 
+                                ondrop="drop(event, '${day}', '${shift.id}')" 
+                                ondragover="allowDrop(event)"
+                                ondragleave="leaveDrop(event)">
+                                ${!isEmpty ? `<div class="shift-count">👥 ${assignments.length}</div>` : ''}
+                                <div class="shift-assignments">
+                                    ${assignments.map((assignment, idx) => {
+                                        const s = staff.find(x => x.id === assignment.staffId);
+                                        if (!s) return '';
+                                        const color = positionColors[assignment.position];
+                                        return `
+                                            <div class="assigned-staff" style="background: ${color}; color: ${assignment.position === 'Garson' ? '#1a1a2e' : 'white'};" draggable="true" ondragstart="dragAssigned(event, '${day}', '${shift.id}', ${idx})">
+                                                <span>${s.name} (${positionEmojis[assignment.position]} ${assignment.position})</span>
+                                                <button class="remove-btn" onclick="removeAssignment('${day}', '${shift.id}', ${idx})">×</button>
+                                            </div>
+                                        `;
+                                    }).join('')}
+                                </div>
+                            </td>
+                        `;
+                    }).join('')}
+                </tr>
+            `).join('');
+        }
+
+        function renderStaffPool() {
+            const pool = document.getElementById('staff-pool');
+            
+            let filteredStaff = staff;
+            if (currentPoolFilter !== 'all') {
+                filteredStaff = staff.filter(s => 
+                    s.role === "Mesul Müdür" || s.positions.includes(currentPoolFilter)
+                );
+            }
+            
+            pool.innerHTML = filteredStaff.map(s => {
+                const displayPositions = s.role === "Mesul Müdür" ? "👑 Tüm Pozisyonlar" : s.positions.join(', ');
+                return `
+                    <div class="pool-item" draggable="true" ondragstart="drag(event, ${s.id})" data-positions="${s.positions.join(',')}">
+                        <div>${s.name}</div>
+                        <div class="positions">${displayPositions}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function filterPool(position) {
+            currentPoolFilter = position;
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            renderStaffPool();
+        }
+
+        // Drag & Drop
+        function drag(event, staffId) {
+            event.dataTransfer.setData('staffId', staffId);
+            event.dataTransfer.setData('type', 'new');
+            event.target.classList.add('dragging');
+        }
+
+        function dragAssigned(event, day, shiftId, index) {
+            event.dataTransfer.setData('day', day);
+            event.dataTransfer.setData('shiftId', shiftId);
+            event.dataTransfer.setData('index', index);
+            event.dataTransfer.setData('type', 'move');
+        }
+
+        function allowDrop(event) {
+            event.preventDefault();
+            event.currentTarget.classList.add('drag-over');
+        }
+
+        function leaveDrop(event) {
+            event.currentTarget.classList.remove('drag-over');
+        }
+
+        function drop(event, day, shiftId) {
+            event.preventDefault();
+            event.currentTarget.classList.remove('drag-over');
             
             const type = event.dataTransfer.getData('type');
             
@@ -9,17 +1875,22 @@
                 const assignment = schedule[sourceDay][sourceShiftId][sourceIndex];
                 const s = staff.find(x => x.id === assignment.staffId);
                 
+                // Check if staff can work in this position
                 if (s && s.role !== "Mesul Müdür" && s.positions.length > 0 && !s.positions.includes(assignment.position)) {
                     showAlert(`${s.name} ${assignment.position} pozisyonunda çalışamaz!`, 'error');
                     return;
                 }
                 
+                // Check conflict
                 if (hasConflict(assignment.staffId, day, shiftId, sourceDay, sourceShiftId)) {
                     showAlert('Bu personel bu saatte başka bir vardiyada atanmış!', 'error');
                     return;
                 }
                 
+                // Remove from source
                 schedule[sourceDay][sourceShiftId].splice(sourceIndex, 1);
+                
+                // Add to target
                 schedule[day][shiftId].push(assignment);
             } else {
                 const staffId = parseInt(event.dataTransfer.getData('staffId'));
@@ -27,14 +1898,17 @@
                 
                 if (!s) return;
                 
+                // Check conflict
                 if (hasConflict(staffId, day, shiftId)) {
                     showAlert('Bu personel bu saatte başka bir vardiyada atanmış!', 'error');
                     return;
                 }
                 
+                // Select position based on filter or staff positions
                 const position = selectPosition(s);
                 if (!position) return;
                 
+                // Check if staff can work in selected position
                 if (s.role !== "Mesul Müdür" && s.positions.length > 0 && !s.positions.includes(position)) {
                     showAlert(`${s.name} ${position} pozisyonunda çalışamaz!`, 'error');
                     return;
@@ -46,11 +1920,11 @@
             saveToStorage();
             renderSchedule();
             updateDashboard();
-            updateBadges();
             showAlert('Vardiya atandı', 'success');
         }
 
         function selectPosition(staffMember) {
+            // Mesul Müdür can be assigned to any position
             if (staffMember.role === 'Mesul Müdür') {
                 const allPositions = ["Izgara", "Mutfak", "Ocak", "Kasiyer", "Garson", "Temizlik"];
                 if (currentPoolFilter !== 'all' && allPositions.includes(currentPoolFilter)) {
@@ -66,6 +1940,7 @@
                 return allPositions[0];
             }
             
+            // If filter is active and staff has that position, use it
             if (currentPoolFilter !== 'all' && staffMember.positions.includes(currentPoolFilter)) {
                 return currentPoolFilter;
             }
@@ -106,6 +1981,7 @@
                     if (existing && d === day) {
                         const existingShift = shiftTimes[s.id];
                         
+                        // Check overlap
                         if (newShift.start < existingShift.end && newShift.end > existingShift.start) {
                             return true;
                         }
@@ -121,10 +1997,10 @@
             saveToStorage();
             renderSchedule();
             updateDashboard();
-            updateBadges();
             showAlert('Atama kaldırıldı', 'success');
         }
 
+        // Schedule Actions
         function copyWeek() {
             if (!confirm('Bu haftayı gelecek haftaya kopyalamak istiyor musunuz?')) return;
             showAlert('Bu özellik yakında eklenecek', 'error');
@@ -142,7 +2018,6 @@
             saveToStorage();
             renderSchedule();
             updateDashboard();
-            updateBadges();
             showAlert('Hafta temizlendi', 'success');
         }
 
@@ -186,6 +2061,7 @@
                 return;
             }
             
+            // Copy to clipboard
             navigator.clipboard.writeText(message).then(() => {
                 showToast('✅ Kopyalandı! WhatsApp\'a yapıştırabilirsiniz');
             }).catch(() => {
@@ -193,450 +2069,7 @@
             });
         }
 
-        // PERFORMANCE MODULE
-        function openPerformanceModal() {
-            currentRatings = { speed: 0, hygiene: 0, quality: 0, teamwork: 0, stress: 0 };
-            
-            const staffSelect = document.getElementById('perf-staff');
-            staffSelect.innerHTML = staff.map(s => 
-                `<option value="${s.id}">${s.name}</option>`
-            ).join('');
-            
-            updatePerformancePositions();
-            resetStars();
-            document.getElementById('perf-notes').value = '';
-            document.getElementById('performance-modal').classList.add('show');
-        }
-
-        function closePerformanceModal() {
-            document.getElementById('performance-modal').classList.remove('show');
-        }
-
-        function updatePerformancePositions() {
-            const staffId = parseInt(document.getElementById('perf-staff').value);
-            const s = staff.find(x => x.id === staffId);
-            if (!s) return;
-            
-            const posSelect = document.getElementById('perf-position');
-            if (s.role === "Mesul Müdür") {
-                const allPositions = ["Izgara", "Mutfak", "Ocak", "Kasiyer", "Garson", "Temizlik"];
-                posSelect.innerHTML = allPositions.map(p => 
-                    `<option value="${p}">${positionEmojis[p]} ${p}</option>`
-                ).join('');
-            } else {
-                posSelect.innerHTML = s.positions.map(p => 
-                    `<option value="${p}">${positionEmojis[p]} ${p}</option>`
-                ).join('');
-            }
-        }
-
-        document.getElementById('perf-staff')?.addEventListener('change', updatePerformancePositions);
-
-        function setRating(event, rating) {
-            const container = event.target.closest('.stars');
-            const criteria = container.dataset.criteria;
-            currentRatings[criteria] = rating;
-            
-            const stars = container.querySelectorAll('.star');
-            stars.forEach((star, index) => {
-                if (index < rating) {
-                    star.classList.add('filled');
-                } else {
-                    star.classList.remove('filled');
-                }
-            });
-        }
-
-        function resetStars() {
-            document.querySelectorAll('.stars').forEach(container => {
-                container.querySelectorAll('.star').forEach(star => {
-                    star.classList.remove('filled');
-                });
-            });
-        }
-
-        function savePerformance(event) {
-            event.preventDefault();
-            
-            const staffId = parseInt(document.getElementById('perf-staff').value);
-            const position = document.getElementById('perf-position').value;
-            const notes = document.getElementById('perf-notes').value;
-            
-            if (Object.values(currentRatings).some(r => r === 0)) {
-                showAlert('Lütfen tüm kriterleri değerlendirin', 'error');
-                return;
-            }
-            
-            const performance = {
-                id: performances.length + 1,
-                staffId,
-                position,
-                date: new Date().toISOString(),
-                ratings: { ...currentRatings },
-                notes
-            };
-            
-            performances.push(performance);
-            saveToStorage();
-            updateBadges();
-            closePerformanceModal();
-            renderPerformancePage();
-            showAlert('Performans değerlendirmesi kaydedildi', 'success');
-        }
-
-        function renderPerformancePage() {
-            renderPerformanceReviews();
-            renderPerformanceSummary();
-        }
-
-        function renderPerformanceReviews() {
-            const container = document.getElementById('review-list');
-            
-            if (performances.length === 0) {
-                container.innerHTML = '<div class="empty-list">Henüz değerlendirme yapılmamış</div>';
-                return;
-            }
-            
-            const sorted = [...performances].sort((a, b) => 
-                new Date(b.date) - new Date(a.date)
-            ).slice(0, 10);
-            
-            container.innerHTML = sorted.map(perf => {
-                const s = staff.find(x => x.id === perf.staffId);
-                if (!s) return '';
-                
-                const avg = Object.values(perf.ratings).reduce((a, b) => a + b, 0) / 5;
-                const date = new Date(perf.date).toLocaleDateString('tr-TR');
-                
-                return `
-                    <div class="review-item">
-                        <div class="review-header">
-                            <div>
-                                <strong>${s.name}</strong> - ${positionEmojis[perf.position]} ${perf.position}
-                            </div>
-                            <div style="display: flex; align-items: center; gap: 8px;">
-                                <span style="color: #ffd700;">⭐ ${avg.toFixed(1)}/5</span>
-                                <span class="review-date">${date}</span>
-                            </div>
-                        </div>
-                        <div class="review-criteria">
-                            <div class="criteria-item">
-                                <span>Hız:</span>
-                                <span>${'⭐'.repeat(perf.ratings.speed)}</span>
-                            </div>
-                            <div class="criteria-item">
-                                <span>Hijyen:</span>
-                                <span>${'⭐'.repeat(perf.ratings.hygiene)}</span>
-                            </div>
-                            <div class="criteria-item">
-                                <span>Kalite:</span>
-                                <span>${'⭐'.repeat(perf.ratings.quality)}</span>
-                            </div>
-                            <div class="criteria-item">
-                                <span>Takım:</span>
-                                <span>${'⭐'.repeat(perf.ratings.teamwork)}</span>
-                            </div>
-                            <div class="criteria-item">
-                                <span>Stres:</span>
-                                <span>${'⭐'.repeat(perf.ratings.stress)}</span>
-                            </div>
-                        </div>
-                        ${perf.notes ? `<div style="margin-top: 8px; font-size: 0.85rem; color: var(--text-secondary); font-style: italic;">${perf.notes}</div>` : ''}
-                    </div>
-                `;
-            }).join('');
-        }
-
-        function renderPerformanceSummary() {
-            const avgContainer = document.getElementById('avg-performance-summary');
-            const topContainer = document.getElementById('top-performance');
-            
-            if (performances.length === 0) {
-                avgContainer.innerHTML = '<div class="empty-list">Henüz değerlendirme yok</div>';
-                topContainer.innerHTML = '<div class="empty-list">Henüz değerlendirme yok</div>';
-                return;
-            }
-            
-            const staffPerf = {};
-            staff.forEach(s => {
-                const perfs = performances.filter(p => p.staffId === s.id);
-                if (perfs.length > 0) {
-                    const total = perfs.reduce((sum, p) => {
-                        return sum + Object.values(p.ratings).reduce((a, b) => a + b, 0) / 5;
-                    }, 0);
-                    staffPerf[s.id] = total / perfs.length;
-                }
-            });
-            
-            const overallAvg = Object.values(staffPerf).reduce((a, b) => a + b, 0) / Object.keys(staffPerf).length;
-            
-            avgContainer.innerHTML = `
-                <div style="text-align: center; padding: 20px;">
-                    <div style="font-size: 2.5rem; color: #ffd700; margin-bottom: 8px;">⭐ ${overallAvg.toFixed(2)}/5</div>
-                    <div style="color: var(--text-secondary);">Genel Ortalama Performans</div>
-                    <div style="margin-top: 12px; font-size: 0.9rem;">
-                        ${Object.keys(staffPerf).length} personel değerlendirildi
-                    </div>
-                </div>
-            `;
-            
-            const sorted = Object.entries(staffPerf)
-                .sort((a, b) => b[1] - a[1])
-                .slice(0, 3);
-            
-            topContainer.innerHTML = sorted.map(([id, avg]) => {
-                const s = staff.find(x => x.id === parseInt(id));
-                return `
-                    <div style="padding: 12px; background: var(--bg-tertiary); border-radius: 10px; margin-bottom: 8px;">
-                        <div style="display: flex; justify-content: space-between; align-items: center;">
-                            <strong>${s.name}</strong>
-                            <span style="color: #ffd700; font-size: 1.1rem;">⭐ ${avg.toFixed(2)}/5</span>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        function getAveragePerformance(staffId) {
-            const perfs = performances.filter(p => p.staffId === staffId);
-            if (perfs.length === 0) return null;
-            
-            const total = perfs.reduce((sum, p) => {
-                return sum + Object.values(p.ratings).reduce((a, b) => a + b, 0) / 5;
-            }, 0);
-            
-            return total / perfs.length;
-        }
-
-        // GAMIFICATION MODULE
-        function updateBadges() {
-            updateTotalHours();
-            
-            staff.forEach(s => {
-                const earned = [];
-                
-                // Hours badges
-                if (s.totalHours >= 500) earned.push('master');
-                else if (s.totalHours >= 300) earned.push('expert');
-                else if (s.totalHours >= 150) earned.push('experienced');
-                else if (s.totalHours >= 50) earned.push('novice');
-                
-                // Position hours
-                const posHours = {};
-                days.forEach(day => {
-                    shifts.forEach(shift => {
-                        schedule[day][shift.id].forEach(a => {
-                            if (a.staffId === s.id) {
-                                posHours[a.position] = (posHours[a.position] || 0) + 8;
-                            }
-                        });
-                    });
-                });
-                
-                if (posHours['Izgara'] >= 100) earned.push('izgara-master');
-                if (posHours['Garson'] >= 200) earned.push('super-waiter');
-                if (posHours['Mutfak'] >= 150) earned.push('chef-candidate');
-                
-                // Shift count for cashier
-                let cashierShifts = 0;
-                days.forEach(day => {
-                    shifts.forEach(shift => {
-                        if (schedule[day][shift.id].some(a => a.staffId === s.id && a.position === 'Kasiyer')) {
-                            cashierShifts++;
-                        }
-                    });
-                });
-                if (cashierShifts >= 50) earned.push('quick-cashier');
-                
-                // Performance badge
-                const avg = getAveragePerformance(s.id);
-                if (avg && avg >= 4.8) earned.push('star-performer');
-                
-                // Versatile (worked in 4+ positions)
-                if (Object.keys(posHours).length >= 4) earned.push('versatile');
-                
-                s.badges = earned;
-            });
-            
-            saveToStorage();
-        }
-
-        function renderGamificationPage() {
-            renderLeaderboard();
-            renderAllBadges();
-        }
-
-        function showLeaderboard(type) {
-            currentLeaderboardType = type;
-            document.querySelectorAll('.leaderboard-tab').forEach(tab => tab.classList.remove('active'));
-            event.target.classList.add('active');
-            renderLeaderboard();
-        }
-
-        function renderLeaderboard() {
-            const container = document.getElementById('leaderboard-list');
-            let sorted = [];
-            
-            if (currentLeaderboardType === 'weekly') {
-                const staffShifts = {};
-                staff.forEach(s => staffShifts[s.id] = 0);
-                
-                days.forEach(day => {
-                    shifts.forEach(shift => {
-                        schedule[day][shift.id].forEach(a => {
-                            staffShifts[a.staffId]++;
-                        });
-                    });
-                });
-                
-                sorted = staff.map(s => ({
-                    staff: s,
-                    value: staffShifts[s.id],
-                    label: `${staffShifts[s.id]} vardiya`
-                })).filter(x => x.value > 0).sort((a, b) => b.value - a.value);
-                
-            } else if (currentLeaderboardType === 'monthly' || currentLeaderboardType === 'alltime') {
-                sorted = staff.map(s => ({
-                    staff: s,
-                    value: s.totalHours,
-                    label: `${s.totalHours} saat`
-                })).filter(x => x.value > 0).sort((a, b) => b.value - a.value);
-                
-            } else if (currentLeaderboardType === 'performance') {
-                sorted = staff.map(s => {
-                    const avg = getAveragePerformance(s.id);
-                    return {
-                        staff: s,
-                        value: avg || 0,
-                        label: avg ? `⭐ ${avg.toFixed(2)}/5` : 'Değerlendirilmedi'
-                    };
-                }).filter(x => x.value > 0).sort((a, b) => b.value - a.value);
-            }
-            
-            if (sorted.length === 0) {
-                container.innerHTML = '<div class="empty-list">Henüz veri yok</div>';
-                return;
-            }
-            
-            const medals = ['🥇', '🥈', '🥉'];
-            const classes = ['gold', 'silver', 'bronze'];
-            
-            container.innerHTML = sorted.map((item, index) => {
-                const badgeIcons = item.staff.badges.slice(0, 5).map(b => 
-                    badgeDefinitions.find(bd => bd.id === b)?.emoji || ''
-                ).join(' ');
-                
-                return `
-                    <div class="leaderboard-item ${index < 3 ? classes[index] : ''}">
-                        <div class="leaderboard-rank">${index < 3 ? medals[index] : (index + 1)}</div>
-                        <div class="leaderboard-info">
-                            <div class="leaderboard-name">${item.staff.name}</div>
-                            <div class="leaderboard-stats">${item.label}</div>
-                        </div>
-                        ${badgeIcons ? `<div class="leaderboard-badges">${badgeIcons}</div>` : ''}
-                    </div>
-                `;
-            }).join('');
-        }
-
-        function renderAllBadges() {
-            const container = document.getElementById('all-badges');
-            
-            // Get all unique badges earned by any staff
-            const allEarned = new Set();
-            staff.forEach(s => {
-                s.badges.forEach(b => allEarned.add(b));
-            });
-            
-            container.innerHTML = badgeDefinitions.map(badge => {
-                const earned = allEarned.has(badge.id);
-                const earners = staff.filter(s => s.badges.includes(badge.id));
-                
-                return `
-                    <div class="badge-item ${earned ? 'earned' : 'locked'}" title="${earners.map(s => s.name).join(', ') || 'Henüz kimse kazanmadı'}">
-                        <div class="badge-icon">${badge.emoji}</div>
-                        <div class="badge-name">${badge.name}</div>
-                        <div class="badge-desc">${badge.desc}</div>
-                        ${earned ? `<div style="font-size: 0.7rem; color: var(--success); margin-top: 4px;">${earners.length} kişi</div>` : ''}
-                    </div>
-                `;
-            }).join('');
-        }
-
-        // TRAINING MODULE
-        function renderTrainingPage() {
-            renderCertificates();
-            renderTrainingLibrary();
-        }
-
-        function renderCertificates() {
-            const container = document.getElementById('cert-grid');
-            
-            // Example certificates - in real app these would be tracked per staff
-            const certs = [
-                { name: 'HACCP Sertifikası', staff: 'Metehan Arslan', validUntil: '2026-06-15', status: 'valid' },
-                { name: 'İlk Yardım', staff: 'Halime Göksü', validUntil: '2026-02-10', status: 'expiring' },
-                { name: 'Yangın Güvenliği', staff: 'Gizem Erdoğdu', validUntil: '2025-12-01', status: 'expired' },
-                { name: 'HACCP Sertifikası', staff: 'Batuhan Buyral', validUntil: '2026-08-20', status: 'valid' }
-            ];
-            
-            container.innerHTML = certs.map(cert => `
-                <div class="cert-card ${cert.status === 'expiring' ? 'expiring' : ''} ${cert.status === 'expired' ? 'expired' : ''}">
-                    <div class="cert-header">
-                        <div class="cert-name">${cert.name}</div>
-                        <span class="cert-badge ${cert.status}">
-                            ${cert.status === 'valid' ? '✅ Geçerli' : cert.status === 'expiring' ? '⚠️ Yakında' : '❌ Süresi Doldu'}
-                        </span>
-                    </div>
-                    <div style="margin-top: 8px;">
-                        <div style="font-weight: 500; margin-bottom: 4px;">${cert.staff}</div>
-                        <div style="font-size: 0.85rem; color: var(--text-secondary);">
-                            Son Geçerlilik: ${new Date(cert.validUntil).toLocaleDateString('tr-TR')}
-                        </div>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function renderTrainingLibrary() {
-            const container = document.getElementById('training-library');
-            
-            let html = '';
-            
-            Object.entries(trainingLibrary).forEach(([category, trainings]) => {
-                html += `
-                    <div class="training-category">
-                        <div class="training-category-title">
-                            ${positionEmojis[category] || '📖'} ${category}
-                        </div>
-                        <div class="training-list">
-                            ${trainings.map(training => {
-                                const progress = Math.floor(Math.random() * 100); // Random progress for demo
-                                
-                                return `
-                                    <div class="training-item">
-                                        <div class="training-info">
-                                            <div class="training-title">${training.title}</div>
-                                            <div class="training-meta">${training.type} • ${training.duration}</div>
-                                        </div>
-                                        <div class="training-progress">
-                                            <div class="progress-bar">
-                                                <div class="progress-fill" style="width: ${progress}%;"></div>
-                                            </div>
-                                            <div class="progress-text">${progress}% tamamlandı</div>
-                                        </div>
-                                    </div>
-                                `;
-                            }).join('')}
-                        </div>
-                    </div>
-                `;
-            });
-            
-            container.innerHTML = html;
-        }
-
-        // ALERTS
+        // Alert & Toast
         function showAlert(message, type = 'error') {
             const alert = document.getElementById('alert');
             const icon = document.getElementById('alert-icon');
@@ -665,16 +2098,10 @@
             }, 3000);
         }
 
-        // EVENT LISTENERS
+        // Close modal on overlay click
         document.getElementById('staff-modal').addEventListener('click', (e) => {
             if (e.target.classList.contains('modal-overlay')) {
                 closeStaffModal();
-            }
-        });
-
-        document.getElementById('performance-modal').addEventListener('click', (e) => {
-            if (e.target.classList.contains('modal-overlay')) {
-                closePerformanceModal();
             }
         });
     </script>
