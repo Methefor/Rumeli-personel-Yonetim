@@ -1014,6 +1014,68 @@
             }
         }
 
+        
+        /* Performance Styles */
+        .stars {
+            display: flex;
+            gap: 4px;
+            font-size: 1.5rem;
+        }
+
+        .star {
+            cursor: pointer;
+            color: #444;
+            transition: all 0.2s ease;
+        }
+
+        .star.filled {
+            color: #ffd700;
+        }
+
+        .star:hover {
+            transform: scale(1.2);
+        }
+
+        .review-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .review-item {
+            background: var(--bg-tertiary);
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+        }
+
+        .review-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .review-date {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .review-criteria {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .criteria-item {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9rem;
+        }
+
         .page {
             display: none;
         }
@@ -1043,6 +1105,10 @@
                 <div class="nav-item" onclick="showPage('schedule')">
                     <i>📅</i>
                     <span>Vardiya Planı</span>
+                </div>
+                <div class="nav-item" onclick="showPage('performance')">
+                    <i>⭐</i>
+                    <span>Performans</span>
                 </div>
             </nav>
         </aside>
@@ -1230,6 +1296,36 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Performance Page -->
+            <div id="performance-page" class="page">
+                <div class="page-header">
+                    <h2>⭐ Performans Değerlendirme</h2>
+                    <p>Personel performansını değerlendirin ve takip edin</p>
+                </div>
+
+                <button class="btn btn-primary" onclick="openPerformanceModal()" style="margin-bottom: 20px;">
+                    ➕ Yeni Değerlendirme Ekle
+                </button>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+                    <div class="card">
+                        <div class="card-title">📊 Ortalama Performans</div>
+                        <div id="avg-performance-summary"></div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-title">⭐ En Yüksek Performans</div>
+                        <div id="top-performance"></div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">📋 Son Değerlendirmeler</div>
+                    <div class="review-list" id="review-list"></div>
+                </div>
+            </div>
+
         </main>
     </div>
 
@@ -1279,6 +1375,85 @@
                 <div style="display: flex; gap: 12px; margin-top: 20px;">
                     <button type="submit" class="btn btn-primary" style="flex: 1;">Kaydet</button>
                     <button type="button" class="btn btn-secondary" onclick="closeStaffModal()">İptal</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+    <!-- Performance Modal -->
+    <div class="modal-overlay" id="performance-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title">Performans Değerlendirmesi</div>
+                <button class="close-btn" onclick="closePerformanceModal()">×</button>
+            </div>
+            <form onsubmit="savePerformance(event)">
+                <div class="form-group">
+                    <label>Personel Seç</label>
+                    <select id="perf-staff" required onchange="updatePerformancePositions()"></select>
+                </div>
+                <div class="form-group">
+                    <label>Pozisyon</label>
+                    <select id="perf-position" required></select>
+                </div>
+                <div class="form-group">
+                    <label>Hız & Verimlilik</label>
+                    <div class="stars" data-criteria="speed">
+                        <span class="star" onclick="setRating(event, 1)">★</span>
+                        <span class="star" onclick="setRating(event, 2)">★</span>
+                        <span class="star" onclick="setRating(event, 3)">★</span>
+                        <span class="star" onclick="setRating(event, 4)">★</span>
+                        <span class="star" onclick="setRating(event, 5)">★</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Hijyen & Temizlik</label>
+                    <div class="stars" data-criteria="hygiene">
+                        <span class="star" onclick="setRating(event, 1)">★</span>
+                        <span class="star" onclick="setRating(event, 2)">★</span>
+                        <span class="star" onclick="setRating(event, 3)">★</span>
+                        <span class="star" onclick="setRating(event, 4)">★</span>
+                        <span class="star" onclick="setRating(event, 5)">★</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Ürün Kalitesi</label>
+                    <div class="stars" data-criteria="quality">
+                        <span class="star" onclick="setRating(event, 1)">★</span>
+                        <span class="star" onclick="setRating(event, 2)">★</span>
+                        <span class="star" onclick="setRating(event, 3)">★</span>
+                        <span class="star" onclick="setRating(event, 4)">★</span>
+                        <span class="star" onclick="setRating(event, 5)">★</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Takım Çalışması</label>
+                    <div class="stars" data-criteria="teamwork">
+                        <span class="star" onclick="setRating(event, 1)">★</span>
+                        <span class="star" onclick="setRating(event, 2)">★</span>
+                        <span class="star" onclick="setRating(event, 3)">★</span>
+                        <span class="star" onclick="setRating(event, 4)">★</span>
+                        <span class="star" onclick="setRating(event, 5)">★</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Stres Yönetimi</label>
+                    <div class="stars" data-criteria="stress">
+                        <span class="star" onclick="setRating(event, 1)">★</span>
+                        <span class="star" onclick="setRating(event, 2)">★</span>
+                        <span class="star" onclick="setRating(event, 3)">★</span>
+                        <span class="star" onclick="setRating(event, 4)">★</span>
+                        <span class="star" onclick="setRating(event, 5)">★</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Notlar (Opsiyonel)</label>
+                    <textarea id="perf-notes" placeholder="Değerlendirme notları..."></textarea>
+                </div>
+                <div style="display: flex; gap: 12px; margin-top: 20px;">
+                    <button type="submit" class="btn btn-primary" style="flex: 1;">Kaydet</button>
+                    <button type="button" class="btn btn-secondary" onclick="closePerformanceModal()">İptal</button>
                 </div>
             </form>
         </div>
@@ -1341,6 +1516,10 @@
             'Temizlik': '🧹'
         };
 
+
+        let performances = [];
+        let currentRatings = {};
+
         let schedule = {};
         let currentPoolFilter = 'all';
         let editingStaffId = null;
@@ -1357,20 +1536,18 @@
         function loadFromStorage() {
             const savedStaff = localStorage.getItem('staff');
             const savedSchedule = localStorage.getItem('schedule');
+            const savedPerformances = localStorage.getItem('performances');
             
-            if (savedStaff) {
-                staff = JSON.parse(savedStaff);
-            }
-            
-            if (savedSchedule) {
-                schedule = JSON.parse(savedSchedule);
-            }
+            if (savedStaff) staff = JSON.parse(savedStaff);
+            if (savedSchedule) schedule = JSON.parse(savedSchedule);
+            if (savedPerformances) performances = JSON.parse(savedPerformances);
         }
 
         // Save to localStorage
         function saveToStorage() {
             localStorage.setItem('staff', JSON.stringify(staff));
             localStorage.setItem('schedule', JSON.stringify(schedule));
+            localStorage.setItem('performances', JSON.stringify(performances));
         }
 
         // Initialize
@@ -1393,6 +1570,8 @@
             if (page === 'schedule') {
                 renderSchedule();
                 renderStaffPool();
+            } else if (page === 'performance') {
+                renderPerformancePage();
             }
         }
 
@@ -1657,6 +1836,8 @@
                     `<div class="position-tag ${p.toLowerCase()}">${positionEmojis[p]} ${p}</div>`
                 ).join('');
                 
+                const avgPerf = getAveragePerformance(s.id);
+                
                 return `
                     <div class="staff-card ${isManager ? 'manager' : ''}">
                         <div class="staff-header">
@@ -1667,6 +1848,7 @@
                                     ${isPartTime ? ' <span class="part-time-badge">⏰ Part-time</span>' : ''}
                                 </div>
                                 ${isManager ? '<div class="role-badge">Mesul Müdür</div>' : ''}
+                                ${avgPerf ? `<div style="color: #ffd700; font-size: 0.85rem; margin-top: 4px;">⭐ ${avgPerf.toFixed(1)}/5</div>` : ''}
                             </div>
                             <div class="staff-actions">
                                 <button class="icon-btn edit" onclick="editStaff(${s.id})">✏️</button>
@@ -2098,10 +2280,229 @@
             }, 3000);
         }
 
+
+        // PERFORMANCE MODULE
+        function openPerformanceModal() {
+            currentRatings = { speed: 0, hygiene: 0, quality: 0, teamwork: 0, stress: 0 };
+            
+            const staffSelect = document.getElementById('perf-staff');
+            staffSelect.innerHTML = staff.map(s => 
+                `<option value="${s.id}">${s.name}</option>`
+            ).join('');
+            
+            updatePerformancePositions();
+            resetStars();
+            document.getElementById('perf-notes').value = '';
+            document.getElementById('performance-modal').classList.add('show');
+        }
+
+        function closePerformanceModal() {
+            document.getElementById('performance-modal').classList.remove('show');
+        }
+
+        function updatePerformancePositions() {
+            const staffId = parseInt(document.getElementById('perf-staff').value);
+            const s = staff.find(x => x.id === staffId);
+            if (!s) return;
+            
+            const posSelect = document.getElementById('perf-position');
+            if (s.role === "Mesul Müdür") {
+                const allPositions = ["Izgara", "Mutfak", "Ocak", "Kasiyer", "Garson", "Temizlik"];
+                posSelect.innerHTML = allPositions.map(p => 
+                    `<option value="${p}">${positionEmojis[p]} ${p}</option>`
+                ).join('');
+            } else {
+                posSelect.innerHTML = s.positions.map(p => 
+                    `<option value="${p}">${positionEmojis[p]} ${p}</option>`
+                ).join('');
+            }
+        }
+
+        function setRating(event, rating) {
+            const container = event.target.closest('.stars');
+            const criteria = container.dataset.criteria;
+            currentRatings[criteria] = rating;
+            
+            const stars = container.querySelectorAll('.star');
+            stars.forEach((star, index) => {
+                if (index < rating) {
+                    star.classList.add('filled');
+                } else {
+                    star.classList.remove('filled');
+                }
+            });
+        }
+
+        function resetStars() {
+            document.querySelectorAll('.stars').forEach(container => {
+                container.querySelectorAll('.star').forEach(star => {
+                    star.classList.remove('filled');
+                });
+            });
+        }
+
+        function savePerformance(event) {
+            event.preventDefault();
+            
+            const staffId = parseInt(document.getElementById('perf-staff').value);
+            const position = document.getElementById('perf-position').value;
+            const notes = document.getElementById('perf-notes').value;
+            
+            if (Object.values(currentRatings).some(r => r === 0)) {
+                showAlert('Lütfen tüm kriterleri değerlendirin', 'error');
+                return;
+            }
+            
+            const performance = {
+                id: performances.length + 1,
+                staffId,
+                position,
+                date: new Date().toISOString(),
+                ratings: { ...currentRatings },
+                notes
+            };
+            
+            performances.push(performance);
+            saveToStorage();
+            closePerformanceModal();
+            renderPerformancePage();
+            showAlert('Performans değerlendirmesi kaydedildi', 'success');
+        }
+
+        function renderPerformancePage() {
+            renderPerformanceReviews();
+            renderPerformanceSummary();
+        }
+
+        function renderPerformanceReviews() {
+            const container = document.getElementById('review-list');
+            
+            if (performances.length === 0) {
+                container.innerHTML = '<div class="empty-list">Henüz değerlendirme yapılmamış</div>';
+                return;
+            }
+            
+            const sorted = [...performances].sort((a, b) => 
+                new Date(b.date) - new Date(a.date)
+            ).slice(0, 10);
+            
+            container.innerHTML = sorted.map(perf => {
+                const s = staff.find(x => x.id === perf.staffId);
+                if (!s) return '';
+                
+                const avg = Object.values(perf.ratings).reduce((a, b) => a + b, 0) / 5;
+                const date = new Date(perf.date).toLocaleDateString('tr-TR');
+                
+                return `
+                    <div class="review-item">
+                        <div class="review-header">
+                            <div>
+                                <strong>${s.name}</strong> - ${positionEmojis[perf.position]} ${perf.position}
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <span style="color: #ffd700;">⭐ ${avg.toFixed(1)}/5</span>
+                                <span class="review-date">${date}</span>
+                            </div>
+                        </div>
+                        <div class="review-criteria">
+                            <div class="criteria-item">
+                                <span>Hız:</span>
+                                <span>${'⭐'.repeat(perf.ratings.speed)}</span>
+                            </div>
+                            <div class="criteria-item">
+                                <span>Hijyen:</span>
+                                <span>${'⭐'.repeat(perf.ratings.hygiene)}</span>
+                            </div>
+                            <div class="criteria-item">
+                                <span>Kalite:</span>
+                                <span>${'⭐'.repeat(perf.ratings.quality)}</span>
+                            </div>
+                            <div class="criteria-item">
+                                <span>Takım:</span>
+                                <span>${'⭐'.repeat(perf.ratings.teamwork)}</span>
+                            </div>
+                            <div class="criteria-item">
+                                <span>Stres:</span>
+                                <span>${'⭐'.repeat(perf.ratings.stress)}</span>
+                            </div>
+                        </div>
+                        ${perf.notes ? `<div style="margin-top: 8px; font-size: 0.85rem; color: var(--text-secondary); font-style: italic;">"${perf.notes}"</div>` : ''}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderPerformanceSummary() {
+            const avgContainer = document.getElementById('avg-performance-summary');
+            const topContainer = document.getElementById('top-performance');
+            
+            if (performances.length === 0) {
+                avgContainer.innerHTML = '<div class="empty-list">Henüz değerlendirme yok</div>';
+                topContainer.innerHTML = '<div class="empty-list">Henüz değerlendirme yok</div>';
+                return;
+            }
+            
+            const staffPerf = {};
+            staff.forEach(s => {
+                const perfs = performances.filter(p => p.staffId === s.id);
+                if (perfs.length > 0) {
+                    const total = perfs.reduce((sum, p) => {
+                        return sum + Object.values(p.ratings).reduce((a, b) => a + b, 0) / 5;
+                    }, 0);
+                    staffPerf[s.id] = total / perfs.length;
+                }
+            });
+            
+            const overallAvg = Object.values(staffPerf).reduce((a, b) => a + b, 0) / Object.keys(staffPerf).length;
+            
+            avgContainer.innerHTML = `
+                <div style="text-align: center; padding: 20px;">
+                    <div style="font-size: 2.5rem; color: #ffd700; margin-bottom: 8px;">⭐ ${overallAvg.toFixed(2)}/5</div>
+                    <div style="color: var(--text-secondary);">Genel Ortalama Performans</div>
+                    <div style="margin-top: 12px; font-size: 0.9rem;">
+                        ${Object.keys(staffPerf).length} personel değerlendirildi
+                    </div>
+                </div>
+            `;
+            
+            const sorted = Object.entries(staffPerf)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 3);
+            
+            topContainer.innerHTML = sorted.map(([id, avg]) => {
+                const s = staff.find(x => x.id === parseInt(id));
+                return `
+                    <div style="padding: 12px; background: var(--bg-tertiary); border-radius: 10px; margin-bottom: 8px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <strong>${s.name}</strong>
+                            <span style="color: #ffd700; font-size: 1.1rem;">⭐ ${avg.toFixed(2)}/5</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function getAveragePerformance(staffId) {
+            const perfs = performances.filter(p => p.staffId === staffId);
+            if (perfs.length === 0) return null;
+            
+            const total = perfs.reduce((sum, p) => {
+                return sum + Object.values(p.ratings).reduce((a, b) => a + b, 0) / 5;
+            }, 0);
+            
+            return total / perfs.length;
+        }
+
         // Close modal on overlay click
         document.getElementById('staff-modal').addEventListener('click', (e) => {
             if (e.target.classList.contains('modal-overlay')) {
                 closeStaffModal();
+            }
+        });
+
+        document.getElementById('performance-modal').addEventListener('click', (e) => {
+            if (e.target.classList.contains('modal-overlay')) {
+                closePerformanceModal();
             }
         });
     </script>
