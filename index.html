@@ -1,0 +1,682 @@
+            
+            const type = event.dataTransfer.getData('type');
+            
+            if (type === 'move') {
+                const sourceDay = event.dataTransfer.getData('day');
+                const sourceShiftId = event.dataTransfer.getData('shiftId');
+                const sourceIndex = parseInt(event.dataTransfer.getData('index'));
+                
+                const assignment = schedule[sourceDay][sourceShiftId][sourceIndex];
+                const s = staff.find(x => x.id === assignment.staffId);
+                
+                if (s && s.role !== "Mesul Müdür" && s.positions.length > 0 && !s.positions.includes(assignment.position)) {
+                    showAlert(`${s.name} ${assignment.position} pozisyonunda çalışamaz!`, 'error');
+                    return;
+                }
+                
+                if (hasConflict(assignment.staffId, day, shiftId, sourceDay, sourceShiftId)) {
+                    showAlert('Bu personel bu saatte başka bir vardiyada atanmış!', 'error');
+                    return;
+                }
+                
+                schedule[sourceDay][sourceShiftId].splice(sourceIndex, 1);
+                schedule[day][shiftId].push(assignment);
+            } else {
+                const staffId = parseInt(event.dataTransfer.getData('staffId'));
+                const s = staff.find(x => x.id === staffId);
+                
+                if (!s) return;
+                
+                if (hasConflict(staffId, day, shiftId)) {
+                    showAlert('Bu personel bu saatte başka bir vardiyada atanmış!', 'error');
+                    return;
+                }
+                
+                const position = selectPosition(s);
+                if (!position) return;
+                
+                if (s.role !== "Mesul Müdür" && s.positions.length > 0 && !s.positions.includes(position)) {
+                    showAlert(`${s.name} ${position} pozisyonunda çalışamaz!`, 'error');
+                    return;
+                }
+                
+                schedule[day][shiftId].push({ staffId, position });
+            }
+            
+            saveToStorage();
+            renderSchedule();
+            updateDashboard();
+            updateBadges();
+            showAlert('Vardiya atandı', 'success');
+        }
+
+        function selectPosition(staffMember) {
+            if (staffMember.role === 'Mesul Müdür') {
+                const allPositions = ["Izgara", "Mutfak", "Ocak", "Kasiyer", "Garson", "Temizlik"];
+                if (currentPoolFilter !== 'all' && allPositions.includes(currentPoolFilter)) {
+                    return currentPoolFilter;
+                }
+                const options = allPositions.map((p, i) => `${i + 1}. ${positionEmojis[p]} ${p}`).join('\n');
+                const choice = prompt(`Pozisyon seçin:\n${options}`);
+                if (!choice) return null;
+                const index = parseInt(choice) - 1;
+                if (index >= 0 && index < allPositions.length) {
+                    return allPositions[index];
+                }
+                return allPositions[0];
+            }
+            
+            if (currentPoolFilter !== 'all' && staffMember.positions.includes(currentPoolFilter)) {
+                return currentPoolFilter;
+            }
+            
+            if (staffMember.positions.length === 1) {
+                return staffMember.positions[0];
+            }
+            
+            const options = staffMember.positions.map((p, i) => `${i + 1}. ${positionEmojis[p]} ${p}`).join('\n');
+            const choice = prompt(`Pozisyon seçin:\n${options}`);
+            
+            if (!choice) return null;
+            
+            const index = parseInt(choice) - 1;
+            if (index >= 0 && index < staffMember.positions.length) {
+                return staffMember.positions[index];
+            }
+            
+            return staffMember.positions[0];
+        }
+
+        function hasConflict(staffId, day, shiftId, excludeDay = null, excludeShiftId = null) {
+            const shiftTimes = {
+                morning: { start: 8, end: 16 },
+                afternoon: { start: 12, end: 20 },
+                evening: { start: 16, end: 24 }
+            };
+            
+            const newShift = shiftTimes[shiftId];
+            
+            for (const d of days) {
+                for (const s of shifts) {
+                    if (d === excludeDay && s.id === excludeShiftId) continue;
+                    
+                    const assignments = schedule[d][s.id];
+                    const existing = assignments.find(a => a.staffId === staffId);
+                    
+                    if (existing && d === day) {
+                        const existingShift = shiftTimes[s.id];
+                        
+                        if (newShift.start < existingShift.end && newShift.end > existingShift.start) {
+                            return true;
+                        }
+                    }
+                }
+            }
+            
+            return false;
+        }
+
+        function removeAssignment(day, shiftId, index) {
+            schedule[day][shiftId].splice(index, 1);
+            saveToStorage();
+            renderSchedule();
+            updateDashboard();
+            updateBadges();
+            showAlert('Atama kaldırıldı', 'success');
+        }
+
+        function copyWeek() {
+            if (!confirm('Bu haftayı gelecek haftaya kopyalamak istiyor musunuz?')) return;
+            showAlert('Bu özellik yakında eklenecek', 'error');
+        }
+
+        function clearWeek() {
+            if (!confirm('Bu haftanın tüm vardiyalarını temizlemek istediğinizden emin misiniz?')) return;
+            
+            days.forEach(day => {
+                shifts.forEach(shift => {
+                    schedule[day][shift.id] = [];
+                });
+            });
+            
+            saveToStorage();
+            renderSchedule();
+            updateDashboard();
+            updateBadges();
+            showAlert('Hafta temizlendi', 'success');
+        }
+
+        function exportToWhatsApp() {
+            let message = '';
+            
+            days.forEach(day => {
+                const dayAssignments = [];
+                shifts.forEach(shift => {
+                    if (schedule[day][shift.id].length > 0) {
+                        dayAssignments.push({ shift, assignments: schedule[day][shift.id] });
+                    }
+                });
+                
+                if (dayAssignments.length === 0) return;
+                
+                message += `📅 VARDİYA LİSTESİ - ${day}\n\n`;
+                
+                dayAssignments.forEach(({ shift, assignments }) => {
+                    message += `${shift.time}\n`;
+                    
+                    const byPosition = {};
+                    assignments.forEach(a => {
+                        if (!byPosition[a.position]) byPosition[a.position] = [];
+                        const s = staff.find(x => x.id === a.staffId);
+                        if (s) byPosition[a.position].push(s.name);
+                    });
+                    
+                    Object.entries(byPosition).forEach(([position, names]) => {
+                        message += `${positionEmojis[position]} ${position}: ${names.join(', ')}\n`;
+                    });
+                    
+                    message += '\n';
+                });
+                
+                message += '─────────────────\n\n';
+            });
+            
+            if (!message) {
+                showAlert('Henüz vardiya atanmamış!', 'error');
+                return;
+            }
+            
+            navigator.clipboard.writeText(message).then(() => {
+                showToast('✅ Kopyalandı! WhatsApp\'a yapıştırabilirsiniz');
+            }).catch(() => {
+                showAlert('Kopyalama başarısız', 'error');
+            });
+        }
+
+        // PERFORMANCE MODULE
+        function openPerformanceModal() {
+            currentRatings = { speed: 0, hygiene: 0, quality: 0, teamwork: 0, stress: 0 };
+            
+            const staffSelect = document.getElementById('perf-staff');
+            staffSelect.innerHTML = staff.map(s => 
+                `<option value="${s.id}">${s.name}</option>`
+            ).join('');
+            
+            updatePerformancePositions();
+            resetStars();
+            document.getElementById('perf-notes').value = '';
+            document.getElementById('performance-modal').classList.add('show');
+        }
+
+        function closePerformanceModal() {
+            document.getElementById('performance-modal').classList.remove('show');
+        }
+
+        function updatePerformancePositions() {
+            const staffId = parseInt(document.getElementById('perf-staff').value);
+            const s = staff.find(x => x.id === staffId);
+            if (!s) return;
+            
+            const posSelect = document.getElementById('perf-position');
+            if (s.role === "Mesul Müdür") {
+                const allPositions = ["Izgara", "Mutfak", "Ocak", "Kasiyer", "Garson", "Temizlik"];
+                posSelect.innerHTML = allPositions.map(p => 
+                    `<option value="${p}">${positionEmojis[p]} ${p}</option>`
+                ).join('');
+            } else {
+                posSelect.innerHTML = s.positions.map(p => 
+                    `<option value="${p}">${positionEmojis[p]} ${p}</option>`
+                ).join('');
+            }
+        }
+
+        document.getElementById('perf-staff')?.addEventListener('change', updatePerformancePositions);
+
+        function setRating(event, rating) {
+            const container = event.target.closest('.stars');
+            const criteria = container.dataset.criteria;
+            currentRatings[criteria] = rating;
+            
+            const stars = container.querySelectorAll('.star');
+            stars.forEach((star, index) => {
+                if (index < rating) {
+                    star.classList.add('filled');
+                } else {
+                    star.classList.remove('filled');
+                }
+            });
+        }
+
+        function resetStars() {
+            document.querySelectorAll('.stars').forEach(container => {
+                container.querySelectorAll('.star').forEach(star => {
+                    star.classList.remove('filled');
+                });
+            });
+        }
+
+        function savePerformance(event) {
+            event.preventDefault();
+            
+            const staffId = parseInt(document.getElementById('perf-staff').value);
+            const position = document.getElementById('perf-position').value;
+            const notes = document.getElementById('perf-notes').value;
+            
+            if (Object.values(currentRatings).some(r => r === 0)) {
+                showAlert('Lütfen tüm kriterleri değerlendirin', 'error');
+                return;
+            }
+            
+            const performance = {
+                id: performances.length + 1,
+                staffId,
+                position,
+                date: new Date().toISOString(),
+                ratings: { ...currentRatings },
+                notes
+            };
+            
+            performances.push(performance);
+            saveToStorage();
+            updateBadges();
+            closePerformanceModal();
+            renderPerformancePage();
+            showAlert('Performans değerlendirmesi kaydedildi', 'success');
+        }
+
+        function renderPerformancePage() {
+            renderPerformanceReviews();
+            renderPerformanceSummary();
+        }
+
+        function renderPerformanceReviews() {
+            const container = document.getElementById('review-list');
+            
+            if (performances.length === 0) {
+                container.innerHTML = '<div class="empty-list">Henüz değerlendirme yapılmamış</div>';
+                return;
+            }
+            
+            const sorted = [...performances].sort((a, b) => 
+                new Date(b.date) - new Date(a.date)
+            ).slice(0, 10);
+            
+            container.innerHTML = sorted.map(perf => {
+                const s = staff.find(x => x.id === perf.staffId);
+                if (!s) return '';
+                
+                const avg = Object.values(perf.ratings).reduce((a, b) => a + b, 0) / 5;
+                const date = new Date(perf.date).toLocaleDateString('tr-TR');
+                
+                return `
+                    <div class="review-item">
+                        <div class="review-header">
+                            <div>
+                                <strong>${s.name}</strong> - ${positionEmojis[perf.position]} ${perf.position}
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <span style="color: #ffd700;">⭐ ${avg.toFixed(1)}/5</span>
+                                <span class="review-date">${date}</span>
+                            </div>
+                        </div>
+                        <div class="review-criteria">
+                            <div class="criteria-item">
+                                <span>Hız:</span>
+                                <span>${'⭐'.repeat(perf.ratings.speed)}</span>
+                            </div>
+                            <div class="criteria-item">
+                                <span>Hijyen:</span>
+                                <span>${'⭐'.repeat(perf.ratings.hygiene)}</span>
+                            </div>
+                            <div class="criteria-item">
+                                <span>Kalite:</span>
+                                <span>${'⭐'.repeat(perf.ratings.quality)}</span>
+                            </div>
+                            <div class="criteria-item">
+                                <span>Takım:</span>
+                                <span>${'⭐'.repeat(perf.ratings.teamwork)}</span>
+                            </div>
+                            <div class="criteria-item">
+                                <span>Stres:</span>
+                                <span>${'⭐'.repeat(perf.ratings.stress)}</span>
+                            </div>
+                        </div>
+                        ${perf.notes ? `<div style="margin-top: 8px; font-size: 0.85rem; color: var(--text-secondary); font-style: italic;">${perf.notes}</div>` : ''}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderPerformanceSummary() {
+            const avgContainer = document.getElementById('avg-performance-summary');
+            const topContainer = document.getElementById('top-performance');
+            
+            if (performances.length === 0) {
+                avgContainer.innerHTML = '<div class="empty-list">Henüz değerlendirme yok</div>';
+                topContainer.innerHTML = '<div class="empty-list">Henüz değerlendirme yok</div>';
+                return;
+            }
+            
+            const staffPerf = {};
+            staff.forEach(s => {
+                const perfs = performances.filter(p => p.staffId === s.id);
+                if (perfs.length > 0) {
+                    const total = perfs.reduce((sum, p) => {
+                        return sum + Object.values(p.ratings).reduce((a, b) => a + b, 0) / 5;
+                    }, 0);
+                    staffPerf[s.id] = total / perfs.length;
+                }
+            });
+            
+            const overallAvg = Object.values(staffPerf).reduce((a, b) => a + b, 0) / Object.keys(staffPerf).length;
+            
+            avgContainer.innerHTML = `
+                <div style="text-align: center; padding: 20px;">
+                    <div style="font-size: 2.5rem; color: #ffd700; margin-bottom: 8px;">⭐ ${overallAvg.toFixed(2)}/5</div>
+                    <div style="color: var(--text-secondary);">Genel Ortalama Performans</div>
+                    <div style="margin-top: 12px; font-size: 0.9rem;">
+                        ${Object.keys(staffPerf).length} personel değerlendirildi
+                    </div>
+                </div>
+            `;
+            
+            const sorted = Object.entries(staffPerf)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 3);
+            
+            topContainer.innerHTML = sorted.map(([id, avg]) => {
+                const s = staff.find(x => x.id === parseInt(id));
+                return `
+                    <div style="padding: 12px; background: var(--bg-tertiary); border-radius: 10px; margin-bottom: 8px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <strong>${s.name}</strong>
+                            <span style="color: #ffd700; font-size: 1.1rem;">⭐ ${avg.toFixed(2)}/5</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function getAveragePerformance(staffId) {
+            const perfs = performances.filter(p => p.staffId === staffId);
+            if (perfs.length === 0) return null;
+            
+            const total = perfs.reduce((sum, p) => {
+                return sum + Object.values(p.ratings).reduce((a, b) => a + b, 0) / 5;
+            }, 0);
+            
+            return total / perfs.length;
+        }
+
+        // GAMIFICATION MODULE
+        function updateBadges() {
+            updateTotalHours();
+            
+            staff.forEach(s => {
+                const earned = [];
+                
+                // Hours badges
+                if (s.totalHours >= 500) earned.push('master');
+                else if (s.totalHours >= 300) earned.push('expert');
+                else if (s.totalHours >= 150) earned.push('experienced');
+                else if (s.totalHours >= 50) earned.push('novice');
+                
+                // Position hours
+                const posHours = {};
+                days.forEach(day => {
+                    shifts.forEach(shift => {
+                        schedule[day][shift.id].forEach(a => {
+                            if (a.staffId === s.id) {
+                                posHours[a.position] = (posHours[a.position] || 0) + 8;
+                            }
+                        });
+                    });
+                });
+                
+                if (posHours['Izgara'] >= 100) earned.push('izgara-master');
+                if (posHours['Garson'] >= 200) earned.push('super-waiter');
+                if (posHours['Mutfak'] >= 150) earned.push('chef-candidate');
+                
+                // Shift count for cashier
+                let cashierShifts = 0;
+                days.forEach(day => {
+                    shifts.forEach(shift => {
+                        if (schedule[day][shift.id].some(a => a.staffId === s.id && a.position === 'Kasiyer')) {
+                            cashierShifts++;
+                        }
+                    });
+                });
+                if (cashierShifts >= 50) earned.push('quick-cashier');
+                
+                // Performance badge
+                const avg = getAveragePerformance(s.id);
+                if (avg && avg >= 4.8) earned.push('star-performer');
+                
+                // Versatile (worked in 4+ positions)
+                if (Object.keys(posHours).length >= 4) earned.push('versatile');
+                
+                s.badges = earned;
+            });
+            
+            saveToStorage();
+        }
+
+        function renderGamificationPage() {
+            renderLeaderboard();
+            renderAllBadges();
+        }
+
+        function showLeaderboard(type) {
+            currentLeaderboardType = type;
+            document.querySelectorAll('.leaderboard-tab').forEach(tab => tab.classList.remove('active'));
+            event.target.classList.add('active');
+            renderLeaderboard();
+        }
+
+        function renderLeaderboard() {
+            const container = document.getElementById('leaderboard-list');
+            let sorted = [];
+            
+            if (currentLeaderboardType === 'weekly') {
+                const staffShifts = {};
+                staff.forEach(s => staffShifts[s.id] = 0);
+                
+                days.forEach(day => {
+                    shifts.forEach(shift => {
+                        schedule[day][shift.id].forEach(a => {
+                            staffShifts[a.staffId]++;
+                        });
+                    });
+                });
+                
+                sorted = staff.map(s => ({
+                    staff: s,
+                    value: staffShifts[s.id],
+                    label: `${staffShifts[s.id]} vardiya`
+                })).filter(x => x.value > 0).sort((a, b) => b.value - a.value);
+                
+            } else if (currentLeaderboardType === 'monthly' || currentLeaderboardType === 'alltime') {
+                sorted = staff.map(s => ({
+                    staff: s,
+                    value: s.totalHours,
+                    label: `${s.totalHours} saat`
+                })).filter(x => x.value > 0).sort((a, b) => b.value - a.value);
+                
+            } else if (currentLeaderboardType === 'performance') {
+                sorted = staff.map(s => {
+                    const avg = getAveragePerformance(s.id);
+                    return {
+                        staff: s,
+                        value: avg || 0,
+                        label: avg ? `⭐ ${avg.toFixed(2)}/5` : 'Değerlendirilmedi'
+                    };
+                }).filter(x => x.value > 0).sort((a, b) => b.value - a.value);
+            }
+            
+            if (sorted.length === 0) {
+                container.innerHTML = '<div class="empty-list">Henüz veri yok</div>';
+                return;
+            }
+            
+            const medals = ['🥇', '🥈', '🥉'];
+            const classes = ['gold', 'silver', 'bronze'];
+            
+            container.innerHTML = sorted.map((item, index) => {
+                const badgeIcons = item.staff.badges.slice(0, 5).map(b => 
+                    badgeDefinitions.find(bd => bd.id === b)?.emoji || ''
+                ).join(' ');
+                
+                return `
+                    <div class="leaderboard-item ${index < 3 ? classes[index] : ''}">
+                        <div class="leaderboard-rank">${index < 3 ? medals[index] : (index + 1)}</div>
+                        <div class="leaderboard-info">
+                            <div class="leaderboard-name">${item.staff.name}</div>
+                            <div class="leaderboard-stats">${item.label}</div>
+                        </div>
+                        ${badgeIcons ? `<div class="leaderboard-badges">${badgeIcons}</div>` : ''}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderAllBadges() {
+            const container = document.getElementById('all-badges');
+            
+            // Get all unique badges earned by any staff
+            const allEarned = new Set();
+            staff.forEach(s => {
+                s.badges.forEach(b => allEarned.add(b));
+            });
+            
+            container.innerHTML = badgeDefinitions.map(badge => {
+                const earned = allEarned.has(badge.id);
+                const earners = staff.filter(s => s.badges.includes(badge.id));
+                
+                return `
+                    <div class="badge-item ${earned ? 'earned' : 'locked'}" title="${earners.map(s => s.name).join(', ') || 'Henüz kimse kazanmadı'}">
+                        <div class="badge-icon">${badge.emoji}</div>
+                        <div class="badge-name">${badge.name}</div>
+                        <div class="badge-desc">${badge.desc}</div>
+                        ${earned ? `<div style="font-size: 0.7rem; color: var(--success); margin-top: 4px;">${earners.length} kişi</div>` : ''}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // TRAINING MODULE
+        function renderTrainingPage() {
+            renderCertificates();
+            renderTrainingLibrary();
+        }
+
+        function renderCertificates() {
+            const container = document.getElementById('cert-grid');
+            
+            // Example certificates - in real app these would be tracked per staff
+            const certs = [
+                { name: 'HACCP Sertifikası', staff: 'Metehan Arslan', validUntil: '2026-06-15', status: 'valid' },
+                { name: 'İlk Yardım', staff: 'Halime Göksü', validUntil: '2026-02-10', status: 'expiring' },
+                { name: 'Yangın Güvenliği', staff: 'Gizem Erdoğdu', validUntil: '2025-12-01', status: 'expired' },
+                { name: 'HACCP Sertifikası', staff: 'Batuhan Buyral', validUntil: '2026-08-20', status: 'valid' }
+            ];
+            
+            container.innerHTML = certs.map(cert => `
+                <div class="cert-card ${cert.status === 'expiring' ? 'expiring' : ''} ${cert.status === 'expired' ? 'expired' : ''}">
+                    <div class="cert-header">
+                        <div class="cert-name">${cert.name}</div>
+                        <span class="cert-badge ${cert.status}">
+                            ${cert.status === 'valid' ? '✅ Geçerli' : cert.status === 'expiring' ? '⚠️ Yakında' : '❌ Süresi Doldu'}
+                        </span>
+                    </div>
+                    <div style="margin-top: 8px;">
+                        <div style="font-weight: 500; margin-bottom: 4px;">${cert.staff}</div>
+                        <div style="font-size: 0.85rem; color: var(--text-secondary);">
+                            Son Geçerlilik: ${new Date(cert.validUntil).toLocaleDateString('tr-TR')}
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderTrainingLibrary() {
+            const container = document.getElementById('training-library');
+            
+            let html = '';
+            
+            Object.entries(trainingLibrary).forEach(([category, trainings]) => {
+                html += `
+                    <div class="training-category">
+                        <div class="training-category-title">
+                            ${positionEmojis[category] || '📖'} ${category}
+                        </div>
+                        <div class="training-list">
+                            ${trainings.map(training => {
+                                const progress = Math.floor(Math.random() * 100); // Random progress for demo
+                                
+                                return `
+                                    <div class="training-item">
+                                        <div class="training-info">
+                                            <div class="training-title">${training.title}</div>
+                                            <div class="training-meta">${training.type} • ${training.duration}</div>
+                                        </div>
+                                        <div class="training-progress">
+                                            <div class="progress-bar">
+                                                <div class="progress-fill" style="width: ${progress}%;"></div>
+                                            </div>
+                                            <div class="progress-text">${progress}% tamamlandı</div>
+                                        </div>
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+
+        // ALERTS
+        function showAlert(message, type = 'error') {
+            const alert = document.getElementById('alert');
+            const icon = document.getElementById('alert-icon');
+            const msg = document.getElementById('alert-message');
+            
+            alert.className = 'alert ' + type;
+            icon.textContent = type === 'error' ? '⚠️' : '✅';
+            msg.textContent = message;
+            
+            alert.classList.add('show');
+            
+            setTimeout(() => {
+                alert.classList.remove('show');
+            }, 3000);
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            const msg = document.getElementById('toast-message');
+            
+            msg.textContent = message;
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // EVENT LISTENERS
+        document.getElementById('staff-modal').addEventListener('click', (e) => {
+            if (e.target.classList.contains('modal-overlay')) {
+                closeStaffModal();
+            }
+        });
+
+        document.getElementById('performance-modal').addEventListener('click', (e) => {
+            if (e.target.classList.contains('modal-overlay')) {
+                closePerformanceModal();
+            }
+        });
+    </script>
+</body>
+</html>
