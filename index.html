@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rumeli İskelesi Personel Yönetimi</title>
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='grad' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%23e94560;stop-opacity:1'/%3E%3Cstop offset='100%25' style='stop-color:%23ff6b6b;stop-opacity:1'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='12' fill='url(%23grad)'/%3E%3Cpath d='M20 16 h24 a4 4 0 0 1 4 4 v28 a4 4 0 0 1 -4 4 h-24 a4 4 0 0 1 -4 -4 v-28 a4 4 0 0 1 4 -4 z' fill='%23fff' opacity='0.95'/%3E%3Cpath d='M28 12 h8 a2 2 0 0 1 2 2 v2 a2 2 0 0 1 -2 2 h-8 a2 2 0 0 1 -2 -2 v-2 a2 2 0 0 1 2 -2 z' fill='%23e94560'/%3E%3Cline x1='24' y1='26' x2='40' y2='26' stroke='%2316213e' stroke-width='2' stroke-linecap='round'/%3E%3Cline x1='24' y1='34' x2='36' y2='34' stroke='%2316213e' stroke-width='2' stroke-linecap='round'/%3E%3Cline x1='24' y1='42' x2='40' y2='42' stroke='%2316213e' stroke-width='2' stroke-linecap='round'/%3E%3Ccircle cx='24' cy='26' r='2' fill='%2351cf66'/%3E%3Ccircle cx='24' cy='34' r='2' fill='%23ffd43b'/%3E%3Ccircle cx='24' cy='42' r='2' fill='%23339af0'/%3E%3C/svg%3E">
+
     <style>
         * {
             margin: 0;
@@ -1018,88 +1021,20 @@
 
 
 
-        /* Dual Position & Multi-features */
-        .dual-position-badge {
-            background: rgba(255, 215, 0, 0.15);
-            border: 1px dashed #ffd700;
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-size: 0.7rem;
-            color: #ffd700;
-            margin-top: 3px;
-        }
-
-        .special-day-indicator {
-            position: absolute;
-            top: 4px;
-            left: 4px;
-            padding: 3px 8px;
+        /* Özel Günler */
+        .special-day-badge {
+            padding: 4px 8px;
             border-radius: 6px;
-            font-size: 0.7rem;
+            font-size: 0.75rem;
             font-weight: 600;
-            z-index: 10;
+            display: inline-block;
+            margin-left: 8px;
         }
-
-        .special-day-indicator.bayram { background: #dc2626; color: white; }
-        .special-day-indicator.festival { background: #a855f7; color: white; }
-        .special-day-indicator.etkinlik { background: #3b82f6; color: white; }
-        .special-day-indicator.ozel { background: #ec4899; color: white; }
-
-        .conflict-warning {
-            background: rgba(239, 68, 68, 0.1);
-            border: 1px solid #ef4444;
-            padding: 12px;
-            border-radius: 8px;
-            margin: 12px 0;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .conflict-warning-icon {
-            font-size: 1.5rem;
-        }
-
-        .shift-settings-btn {
-            background: var(--bg-tertiary);
-            border: 1px solid var(--border);
-            padding: 8px 16px;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .shift-settings-btn:hover {
-            background: var(--bg-secondary);
-            border-color: var(--accent);
-        }
-
-        .whatsapp-preview {
-            background: #128C7E;
-            color: white;
-            padding: 20px;
-            border-radius: 12px;
-            font-family: 'Courier New', monospace;
-            white-space: pre-line;
-            max-height: 400px;
-            overflow-y: auto;
-            margin-top: 12px;
-        }
-
-        .shift-optional {
-            opacity: 0.6;
-            font-style: italic;
-        }
-
-        .mesul-mudur-warning {
-            background: rgba(255, 193, 7, 0.1);
-            border: 2px solid #ffc107;
-            padding: 10px;
-            border-radius: 8px;
-            margin-top: 8px;
-            font-size: 0.85rem;
-            color: #ffc107;
-        }
+        
+        .special-day-badge.bayram { background: #dc2626; color: white; }
+        .special-day-badge.festival { background: #a855f7; color: white; }
+        .special-day-badge.etkinlik { background: #3b82f6; color: white; }
+        .special-day-badge.ozel { background: #ec4899; color: white; }
 
         /* Leave/Off Day Styles */
         .leave-section {
@@ -1135,6 +1070,63 @@
             display: flex;
             align-items: center;
             gap: 4px;
+        }
+
+
+        /* Yeni Tablo Stili */
+        .schedule-table {
+            table-layout: fixed;
+        }
+
+        .position-label {
+            font-weight: 600;
+            background: var(--bg-secondary);
+            padding: 12px;
+            text-align: left;
+            border-right: 2px solid var(--border);
+            white-space: nowrap;
+        }
+
+        .schedule-cell {
+            padding: 8px;
+            min-height: 50px;
+            vertical-align: top;
+            position: relative;
+        }
+
+        .staff-list {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .staff-tag {
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+
+        .staff-tag:hover {
+            transform: translateX(2px);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .empty-cell {
+            color: var(--text-secondary);
+            font-size: 1.2rem;
+            text-align: center;
+            padding: 20px 0;
+            opacity: 0.3;
+        }
+
+        .schedule-cell.drag-over {
+            background: rgba(51, 154, 240, 0.1);
+            border: 2px dashed var(--accent);
         }
 
         /* Gamification Styles */
@@ -1475,6 +1467,7 @@
                 </div>
 
                 <div class="schedule-controls">
+                        >
                     <div style="display: flex; align-items: center; gap: 12px;">
                         <span style="font-weight: 600;">Bu Hafta</span>
                         <span style="color: var(--text-secondary); font-size: 0.9rem;" id="week-range"></span>
@@ -1515,30 +1508,22 @@
                     </div>
                     
                     <table class="schedule-table">
-                        <thead>
-                            <tr>
-                                <th style="width: 120px;">Vardiya</th>
-                                <th id="day-mon">Pazartesi</th>
-                                <th id="day-tue">Salı</th>
-                                <th id="day-wed">Çarşamba</th>
-                                <th id="day-thu">Perşembe</th>
-                                <th id="day-fri">Cuma</th>
-                                <th id="day-sat">Cumartesi</th>
-                                <th id="day-sun">Pazar</th>
-                            </tr>
-                        </thead>
-                        <tbody id="schedule-body">
-                            <!-- Generated by JS -->
-                        </tbody>
-                    </table>
+                    <thead>
+                        <tr>
+                            <th style="width: 150px;">POZİSYON</th>
+                            <th>Pazartesi</th>
+                            <th>Salı</th>
+                            <th>Çarşamba</th>
+                            <th>Perşembe</th>
+                            <th>Cuma</th>
+                            <th>Cumartesi</th>
+                            <th>Pazar</th>
+                        </tr>
+                    </thead>
+                    <tbody id="schedule-body"></tbody>
+                </table>
                 </div>
 
-
-                
-                <div class="card">
-                    <div class="card-title">⚠️ Çakışma Kontrolleri</div>
-                    <div id="conflict-warnings"></div>
-                </div>
 
                 <div class="card">
                     <div class="card-title">📅 İzinli Personel Yönetimi</div>
@@ -1554,14 +1539,12 @@
                     </div>
                     <div class="filter-buttons">
                         <button class="filter-btn active" onclick="filterPool('all')">Tümü</button>
-                        <button class="filter-btn" onclick="filterPool('Restoran Izgara')">🔥 Restoran Izgara</button>
+                        <button class="filter-btn" onclick="filterPool('Izgara')">🔥 Izgara</button>
                         <button class="filter-btn" onclick="filterPool('Mutfak')">👨‍🍳 Mutfak</button>
                         <button class="filter-btn" onclick="filterPool('Ocak')">🍳 Ocak</button>
                         <button class="filter-btn" onclick="filterPool('Kasiyer')">💰 Kasiyer</button>
                         <button class="filter-btn" onclick="filterPool('Garson')">🍽️ Garson</button>
                         <button class="filter-btn" onclick="filterPool('Temizlik')">🧹 Temizlik</button>
-                        <button class="filter-btn" onclick="filterPool('Restoran Kasa')">💰 Restoran Kasa</button>
-                        <button class="filter-btn" onclick="filterPool('Restoran Garson')">🍽️ Restoran Garson</button>
                     </div>
                     <div class="staff-pool" id="staff-pool">
                         <!-- Generated by JS -->
@@ -1798,54 +1781,6 @@
         </div>
     </div>
 
-
-    <!-- Season Mode Modal -->
-    <div class="modal-overlay" id="season-modal">
-        <div class="modal">
-            <div class="modal-header">
-                <div class="modal-title">⚙️ Sezon & Vardiya Ayarları</div>
-                <button class="close-btn" onclick="closeSeasonModal()">×</button>
-            </div>
-            <div class="form-group">
-                <label>Sezon Modu</label>
-                <select id="season-mode-select" onchange="updateSeasonMode()">
-                    <option value="winter">❄️ Kış Sezonu (Kapanış: 23:00)</option>
-                    <option value="summer">☀️ Yaz Sezonu (Kapanış: 00:00)</option>
-                    <option value="peak">🔥 Yoğun Sezon (Kapanış: 01:00)</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label>Aktif Vardiyalar</label>
-                <div style="display: flex; flex-direction: column; gap: 8px;">
-                    <label style="display: flex; align-items: center; gap: 8px;">
-                        <input type="checkbox" checked disabled>
-                        <span>🌅 Sabah (09:00-17:00) - Ana vardiya</span>
-                    </label>
-                    <label style="display: flex; align-items: center; gap: 8px;">
-                        <input type="checkbox" checked disabled>
-                        <span>🌙 Akşam (Sezona göre) - Ana vardiya</span>
-                    </label>
-                    <label style="display: flex; align-items: center; gap: 8px;">
-                        <input type="checkbox" id="extra1-check">
-                        <span>🕐 Ara-1 (11:00-19:00)</span>
-                    </label>
-                    <label style="display: flex; align-items: center; gap: 8px;">
-                        <input type="checkbox" id="extra2-check">
-                        <span>🕑 Ara-2 (12:00-20:00)</span>
-                    </label>
-                    <label style="display: flex; align-items: center; gap: 8px;">
-                        <input type="checkbox" id="extra3-check">
-                        <span>🕒 Ara-3 (13:00-21:00)</span>
-                    </label>
-                </div>
-            </div>
-            <div style="display: flex; gap: 12px; margin-top: 20px;">
-                <button class="btn btn-primary" onclick="saveSeasonSettings()" style="flex: 1;">Kaydet</button>
-                <button class="btn btn-secondary" onclick="closeSeasonModal()">İptal</button>
-            </div>
-        </div>
-    </div>
-
     <!-- Leave Modal -->
     <div class="modal-overlay" id="leave-modal">
         <div class="modal">
@@ -1920,42 +1855,28 @@
         ];
 
         const days = ['Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi', 'Pazar'];
-
         const shifts = [
-            { id: 'morning', name: 'Sabah', time: '09:00-17:00', start: 9, end: 17 },
-            { id: 'evening', name: 'Akşam', time: '15:00-23:00', start: 15, end: 23 },
-            { id: 'extra1', name: 'Ara-1', time: '11:00-19:00', start: 11, end: 19, optional: true },
-            { id: 'extra2', name: 'Ara-2', time: '12:00-20:00', start: 12, end: 20, optional: true },
-            { id: 'extra3', name: 'Ara-3', time: '13:00-21:00', start: 13, end: 21, optional: true }
+            { id: 'morning', name: 'Sabah', time: '🌅 08:00-16:00' },
+            { id: 'afternoon', name: 'Öğle', time: '🌆 12:00-20:00' },
+            { id: 'evening', name: 'Akşam', time: '🌙 16:00-24:00' }
         ];
 
-
-        
-        const positionEmojis = {
-            'Kasiyer': '💰',
-            'Ocak': '☕',
-            'Mutfak': '👨‍🍳',
-            'Garson': '🍽️',
-            'Temizlik': '🧹',
-            'Restoran Kasa': '💰',
-            'Restoran Izgara': '🔥',
-            'Restoran Garson': '🍽️'
-        };
-
         const positionColors = {
-            'Kasiyer': '#339af0',
-            'Ocak': '#ff922b',
+            'Izgara': '#ff6b6b',
             'Mutfak': '#51cf66',
+            'Ocak': '#ff922b',
+            'Kasiyer': '#339af0',
             'Garson': '#ffd43b',
-            'Temizlik': '#9775fa',
-            'Restoran Kasa': '#4dabf7',
-            'Restoran Izgara': '#ff6b6b',
-            'Restoran Garson': '#ffe066'
+            'Temizlik': '#9775fa'
         };
 
-        const sections = {
-            'Kafeterya': ['Kasiyer', 'Ocak', 'Mutfak', 'Garson', 'Temizlik'],
-            'Restoran': ['Restoran Kasa', 'Restoran Izgara', 'Restoran Garson']
+        const positionEmojis = {
+            'Izgara': '🔥',
+            'Mutfak': '👨‍🍳',
+            'Ocak': '☕',
+            'Kasiyer': '💰',
+            'Garson': '🍽️',
+            'Temizlik': '🧹'
         };
 
 
@@ -1976,13 +1897,8 @@
         ];
 
         let currentLeaderboardType = 'weekly';
-
-        let seasonMode = 'winter'; // winter, summer, peak
-        let activeShifts = ['morning', 'evening']; // Aktif vardiyalar
-        let specialDays = {}; // { day: { type: 'bayram', name: 'Ramazan Bayramı' } }
-        let conflictWarnings = []; // Uyarı listesi
-
-        let leaves = {}; // { day: [{ staffId, type }] }
+        let leaves = {};
+        let specialDays = {}; // { day: { type: "bayram", name: "Ramazan Bayramı" } } // { day: [{ staffId, type }] }
 
         let currentRatings = {};
 
@@ -1992,7 +1908,7 @@
 
         // Initialize schedule
         days.forEach(day => {
-            if (!schedule[day]) schedule[day] = {};
+            schedule[day] = {};
             shifts.forEach(shift => {
                 schedule[day][shift.id] = [];
             });
@@ -2011,10 +1927,6 @@
             if (savedLeaves) leaves = JSON.parse(savedLeaves);
             const savedSpecialDays = localStorage.getItem('specialDays');
             if (savedSpecialDays) specialDays = JSON.parse(savedSpecialDays);
-            const savedSeasonMode = localStorage.getItem('seasonMode');
-            if (savedSeasonMode) seasonMode = savedSeasonMode;
-            const savedActiveShifts = localStorage.getItem('activeShifts');
-            if (savedActiveShifts) activeShifts = JSON.parse(savedActiveShifts);
         }
 
         // Save to localStorage
@@ -2024,44 +1936,84 @@
             localStorage.setItem('performances', JSON.stringify(performances));
             localStorage.setItem('leaves', JSON.stringify(leaves));
             localStorage.setItem('specialDays', JSON.stringify(specialDays));
-            localStorage.setItem('seasonMode', seasonMode);
-            localStorage.setItem('activeShifts', JSON.stringify(activeShifts));
         }
 
         // Initialize
-        
-        // INITIALIZATION - Sistem başlatma
         loadFromStorage();
-        
-        // Aktif vardiyaları kontrol et
-        if (!activeShifts || activeShifts.length === 0) {
-            activeShifts = ['morning', 'evening'];
-        }
-        
-        // Schedule'ı tüm vardiyalar için başlat
+        // Initialize schedule structure
         days.forEach(day => {
             if (!schedule[day]) schedule[day] = {};
             shifts.forEach(shift => {
-                if (!schedule[day][shift.id]) {
-                    schedule[day][shift.id] = [];
-                }
+                if (!schedule[day][shift.id]) schedule[day][shift.id] = [];
             });
         });
-        
-        // Leaves'i başlat
-        days.forEach(day => {
-            if (!leaves[day]) leaves[day] = [];
-        });
-        
-        // Diğer başlatmalar
-        initializeLeaves();
-        updateBadges();
+
         updateDashboard();
         renderStaffList();
         renderSchedule();
+        renderLeaveSummary();
         renderStaffPool();
         updateWeekRange();
         highlightToday();
+
+        // Navigation
+        function showPage(page) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            
+            document.getElementById(page + '-page').classList.add('active');
+            event.target.closest('.nav-item').classList.add('active');
+            
+            if (page === 'schedule') {
+                renderSchedule();
+        renderLeaveSummary();
+                renderStaffPool();
+            } else if (page === 'performance') {
+                renderPerformancePage();
+            } else if (page === 'gamification') {
+                renderGamificationPage();
+            }
+        }
+
+        function toggleSidebar() {
+            document.querySelector('.sidebar').classList.toggle('show');
+        }
+
+        // Update week range
+        function updateWeekRange() {
+            const today = new Date();
+            const monday = new Date(today);
+            monday.setDate(today.getDate() - today.getDay() + 1);
+            const sunday = new Date(monday);
+            sunday.setDate(monday.getDate() + 6);
+            
+            const formatDate = (date) => {
+                return `${date.getDate()}.${date.getMonth() + 1}.${date.getFullYear()}`;
+            };
+            
+            document.getElementById('week-range').textContent = 
+                `${formatDate(monday)} - ${formatDate(sunday)}`;
+        }
+
+        // Highlight today
+        function highlightToday() {
+            const today = new Date().getDay();
+            const dayIndex = today === 0 ? 6 : today - 1; // Convert Sunday=0 to index 6
+            const dayIds = ['day-mon', 'day-tue', 'day-wed', 'day-thu', 'day-fri', 'day-sat', 'day-sun'];
+            
+            if (dayIndex >= 0 && dayIndex < dayIds.length) {
+                const todayHeader = document.getElementById(dayIds[dayIndex]);
+                if (todayHeader) {
+                    todayHeader.classList.add('today');
+                    todayHeader.innerHTML += ' <span style="font-size: 0.8rem;">📍 BUGÜN</span>';
+                }
+            }
+        }
+
+        // Dashboard
+        function updateDashboard() {
+            initializeLeaves();
+        updateBadges();
             document.getElementById('total-staff').textContent = staff.length;
             
             let totalShifts = 0;
@@ -2408,106 +2360,112 @@
         }
 
         // Schedule
-        
         function renderSchedule() {
             const tbody = document.getElementById('schedule-body');
+            if (!tbody) return;
+            
+            const currentShift = document.getElementById('shift-filter')?.value || 'morning';
+            const shift = shifts.find(s => s.id === currentShift);
+            
+            if (!shift) return;
+            
+            // Her vardiya için pozisyonlar
+            const positions = [
+                { label: '💰 KASA', key: 'Kasiyer', maxCount: 1 },
+                { label: '☕ OCAK', key: 'Ocak', maxCount: 1 },
+                { label: '👨‍🍳 MUTFAK', key: 'Mutfak', maxCount: 1 },
+                { label: '🍽️ GARSON', key: 'Garson', maxCount: 8 },
+                { label: '🧹 TEMİZLİK', key: 'Temizlik', maxCount: 1 },
+                { label: '💰 R.KASA', key: 'Restoran Kasa', maxCount: 1 },
+                { label: '🔥 R.IZGARA', key: 'Restoran Izgara', maxCount: 1 },
+                { label: '🍽️ R.GARSON', key: 'Restoran Garson', maxCount: 3 }
+            ];
             
             let html = '';
             
-            activeShifts.forEach(shiftId => {
-                const shift = shifts.find(s => s.id === shiftId);
-                if (!shift) return;
+            // Her pozisyon için bir satır
+            positions.forEach(pos => {
+                html += `<tr>`;
+                html += `<td class="position-label">${pos.label}</td>`;
                 
-                html += `
-                <tr>
-                    <td class="shift-label">
-                        <div style="font-weight: 600;">${shift.name}</div>
-                        <div style="font-size: 0.75rem; color: var(--text-secondary);">${shift.time}</div>
-                    </td>
-                    ${days.map(day => {
-                        const assignments = schedule[day]?.[shiftId] || [];
-                        const isEmpty = assignments.length === 0;
-                        const specialDay = specialDays[day];
-                        
-                        let cellContent = '';
-                        
-                        // Özel gün gösterimi
-                        if (specialDay) {
-                            cellContent += `<div class="special-day-indicator ${specialDay.type}">${specialDay.name}</div>`;
+                // Her gün için bir hücre
+                days.forEach(day => {
+                    const assignments = schedule[day]?.[shift.id] || [];
+                    
+                    // Bu pozisyondaki personeller
+                    const staffInPosition = assignments.filter(a => {
+                        if (a.positions) {
+                            return a.positions.includes(pos.key);
                         }
-                        
-                        // Personel sayısı
-                        if (!isEmpty) {
-                            cellContent += `<div class="shift-count">👥 ${assignments.length}</div>`;
-                        }
-                        
-                        // Atanan personeller
-                        cellContent += '<div class="shift-assignments">';
-                        
-                        
-                        assignments.forEach((assignment, idx) => {
+                        return a.position === pos.key;
+                    });
+                    
+                    const specialDay = specialDays[day];
+                    const dayLeaves = leaves[day] || [];
+                    
+                    html += `
+                        <td class="schedule-cell" 
+                            ondrop="dropToPosition(event, '${day}', '${shift.id}', '${pos.key}')" 
+                            ondragover="allowDrop(event)"
+                            ondragleave="leaveDrop(event)">
+                    `;
+                    
+                    // Özel gün badge'i
+                    if (specialDay) {
+                        html += `<div class="special-day-badge ${specialDay.type}" style="margin-bottom: 4px;">${specialDay.name}</div>`;
+                    }
+                    
+                    // Personelleri göster
+                    if (staffInPosition.length > 0) {
+                        html += '<div class="staff-list">';
+                        staffInPosition.forEach((assignment, idx) => {
                             const s = staff.find(x => x.id === assignment.staffId);
                             if (!s) return;
                             
-                            // Çift pozisyon kontrolü - hem position hem positions destekle
-                            let positions = [];
-                            if (assignment.positions && Array.isArray(assignment.positions)) {
-                                positions = assignment.positions;
-                            } else if (assignment.position) {
-                                positions = [assignment.position];
-                            } else {
-                                return; // Pozisyon yok, atla
-                            }
+                            const hasMultiPos = assignment.positions && assignment.positions.length > 1;
+                            const otherPositions = hasMultiPos ? assignment.positions.filter(p => p !== pos.key) : [];
                             
-                            let primaryPos = positions[0];
-                            let color = positionColors[primaryPos] || '#666';
-                            
-                            let displayText = s.name;
-                            if (positions.length > 1) {
-                                displayText += ` (${positions.map(p => positionEmojis[p] || '📦').join(' + ')})`;
-                            } else {
-                                displayText += ` (${positionEmojis[primaryPos] || '📦'} ${primaryPos})`;
-                            }
-                            
-                            const isLightBg = primaryPos === 'Garson' || primaryPos === 'Restoran Garson';
-                            
-                            cellContent += `
-                                <div class="assigned-staff" style="background: ${color}; color: ${isLightBg ? '#1a1a2e' : 'white'};" draggable="true" ondragstart="dragAssigned(event, '${day}', '${shiftId}', ${idx})">
-                                    <span>${displayText}</span>
-                                    <button class="remove-btn" onclick="removeAssignment('${day}', '${shiftId}', ${idx})">×</button>
+                            html += `
+                                <div class="staff-tag" draggable="true" 
+                                     ondragstart="dragFromPosition(event, '${day}', '${shift.id}', ${assignment.staffId}, '${pos.key}')"
+                                     style="background: ${positionColors[pos.key] || '#666'}; color: white; cursor: move;">
+                                    ${s.name}
+                                    ${hasMultiPos ? ' +' + otherPositions.map(p => positionEmojis[p]).join('') : ''}
+                                    <button class="remove-btn" onclick="removeFromPosition('${day}', '${shift.id}', ${assignment.staffId}, '${pos.key}')">×</button>
                                 </div>
                             `;
                         });
-
-                        cellContent += '</div>';
-                        
-                        // İzinli personeller
-                        const dayLeaves = leaves[day] || [];
-                        if (dayLeaves.length > 0) {
-                            cellContent += '<div class="leave-section">';
-                            cellContent += '<div class="leave-title">🏖️ İzinli</div>';
-                            cellContent += '<div class="leave-list">';
-                            dayLeaves.forEach(leave => {
-                                const s = staff.find(x => x.id === leave.staffId);
-                                if (s) {
-                                    cellContent += `<div class="leave-item">${s.name}</div>`;
-                                }
-                            });
-                            cellContent += '</div></div>';
-                        }
-                        
-                        return `
-                            <td class="shift-cell ${isEmpty ? 'empty' : ''}" 
-                                ondrop="drop(event, '${day}', '${shiftId}')" 
-                                ondragover="allowDrop(event)"
-                                ondragleave="leaveDrop(event)">
-                                ${cellContent}
-                            </td>
-                        `;
-                    }).join('')}
-                </tr>
-                `;
+                        html += '</div>';
+                    } else {
+                        html += '<div class="empty-cell">➕</div>';
+                    }
+                    
+                    html += `</td>`;
+                });
+                
+                html += `</tr>`;
             });
+            
+            // İzinli personel satırı
+            html += `<tr><td class="position-label">🏖️ İZİNLİ</td>`;
+            days.forEach(day => {
+                const dayLeaves = leaves[day] || [];
+                html += `<td class="schedule-cell" style="background: rgba(255, 146, 43, 0.05);">`;
+                if (dayLeaves.length > 0) {
+                    html += '<div class="staff-list">';
+                    dayLeaves.forEach(leave => {
+                        const s = staff.find(x => x.id === leave.staffId);
+                        if (s) {
+                            html += `<div class="staff-tag" style="background: var(--ocak); color: white; font-size: 0.8rem;">${s.name}</div>`;
+                        }
+                    });
+                    html += '</div>';
+                } else {
+                    html += '<div class="empty-cell">-</div>';
+                }
+                html += `</td>`;
+            });
+            html += `</tr>`;
             
             tbody.innerHTML = html;
         }
@@ -2528,6 +2486,7 @@
                 return `
                     <div class="pool-item" draggable="true" ondragstart="drag(event, ${s.id})" data-positions="${s.positions.join(',')}">
                         <div>${s.name}</div>
+                        ${s.badges.length > 0 ? `<div style="font-size: 1.2rem; margin-bottom: 8px;">${s.badges.slice(0, 3).map(b => badgeDefinitions.find(bd => bd.id === b)?.emoji || '').join(' ')}</div>` : ''}
                         <div class="positions">${displayPositions}</div>
                     </div>
                 `;
@@ -2565,21 +2524,124 @@
         }
 
         
-        function drop(event, day, shiftId) {
+        
+        function dropToPosition(event, day, shiftId, position) {
             event.preventDefault();
+            event.currentTarget.classList.remove('drag-over');
             
-            // Schedule güvenlik kontrolü
             if (!schedule[day]) schedule[day] = {};
             if (!schedule[day][shiftId]) schedule[day][shiftId] = [];
             
+            const staffId = parseInt(event.dataTransfer.getData('staffId'));
+            const type = event.dataTransfer.getData('type');
+            
+            if (!staffId) return;
+            
+            const s = staff.find(x => x.id === staffId);
+            if (!s) return;
+            
+            // İzinli mi?
+            const dayLeaves = leaves[day] || [];
+            if (dayLeaves.some(l => l.staffId === staffId)) {
+                showAlert(`${s.name} bu gün izinli!`, 'error');
+                return;
+            }
+            
+            // Zaten var mı?
+            const existing = schedule[day][shiftId].find(a => a.staffId === staffId);
+            
+            if (existing) {
+                // Çift pozisyon ekle
+                if (!existing.positions) {
+                    existing.positions = [existing.position];
+                    delete existing.position;
+                }
+                
+                if (!existing.positions.includes(position)) {
+                    existing.positions.push(position);
+                    saveToStorage();
+                    updateBadges();
+                    renderSchedule();
+                    showAlert(`İkinci pozisyon: ${position}`, 'success');
+                } else {
+                    showAlert('Bu pozisyon zaten atanmış!', 'error');
+                }
+                return;
+            }
+            
+            // Yeni atama
+            if (s.role !== "Mesul Müdür" && s.positions.length > 0 && !s.positions.includes(position)) {
+                showAlert(`${s.name} ${position} pozisyonunda çalışamaz!`, 'error');
+                return;
+            }
+            
+            schedule[day][shiftId].push({
+                staffId: staffId,
+                position: position
+            });
+            
+            saveToStorage();
+            updateBadges();
+            renderSchedule();
+            updateDashboard();
+            showAlert(`${s.name} → ${position}`, 'success');
+        }
 
+        function dragFromPosition(event, day, shiftId, staffId, position) {
+            event.dataTransfer.setData('staffId', staffId);
+            event.dataTransfer.setData('day', day);
+            event.dataTransfer.setData('shiftId', shiftId);
+            event.dataTransfer.setData('position', position);
+            event.dataTransfer.setData('type', 'move');
+        }
+
+        function removeFromPosition(day, shiftId, staffId, position) {
+            if (!schedule[day] || !schedule[day][shiftId]) return;
+            
+            const assignment = schedule[day][shiftId].find(a => a.staffId === staffId);
+            if (!assignment) return;
+            
+            if (assignment.positions && assignment.positions.length > 1) {
+                // Sadece bu pozisyonu kaldır
+                assignment.positions = assignment.positions.filter(p => p !== position);
+                if (assignment.positions.length === 1) {
+                    assignment.position = assignment.positions[0];
+                    delete assignment.positions;
+                }
+            } else {
+                // Tüm atamayı kaldır
+                schedule[day][shiftId] = schedule[day][shiftId].filter(a => a.staffId !== staffId);
+            }
+            
+            saveToStorage();
+            updateBadges();
+            renderSchedule();
+            updateDashboard();
+            showAlert('Atama kaldırıldı', 'success');
+        }
+
+
+        function drop(event, day, shiftId) {
+            event.preventDefault();
             event.currentTarget.classList.remove('drag-over');
+            
+            // Güvenlik kontrolü
+            if (!schedule[day]) schedule[day] = {};
+            if (!schedule[day][shiftId]) schedule[day][shiftId] = [];
             
             const type = event.dataTransfer.getData('type');
             const staffId = parseInt(event.dataTransfer.getData('staffId'));
-            const s = staff.find(x => x.id === staffId);
             
-            if (!s) return;
+            if (!staffId) {
+                showAlert('Personel bilgisi alınamadı', 'error');
+                return;
+            }
+            
+            const s = staff.find(x => x.id === staffId);
+            if (!s) {
+                showAlert('Personel bulunamadı', 'error');
+                return;
+            }
             
             // İzinli mi kontrol
             const dayLeaves = leaves[day] || [];
@@ -2588,47 +2650,11 @@
                 return;
             }
             
-            if (type === 'move') {
-                const sourceDay = event.dataTransfer.getData('day');
-                const sourceShiftId = event.dataTransfer.getData('shiftId');
-                const sourceIndex = parseInt(event.dataTransfer.getData('index'));
-                
-                const assignment = schedule[sourceDay][sourceShiftId][sourceIndex];
-                
-                if (hasConflict(assignment.staffId, day, shiftId, sourceDay, sourceShiftId)) {
-                    showAlert('Bu personel bu saatte başka bir vardiyada atanmış!', 'error');
-                    return;
-                }
-                
-                schedule[sourceDay][sourceShiftId].splice(sourceIndex, 1);
-                schedule[day][shiftId].push(assignment);
-                
-                saveToStorage();
-                
-        // Aktif vardiyaları başlat
-        if (!activeShifts || activeShifts.length === 0) {
-            activeShifts = ['morning', 'evening'];
-        }
-
-        // Schedule'ı tüm vardiyalar için başlat
-        days.forEach(day => {
-            if (!schedule[day]) schedule[day] = {};
-            shifts.forEach(shift => {
-                if (!schedule[day][shift.id]) schedule[day][shift.id] = [];
-            });
-        });
-
-        updateBadges();
-                renderSchedule();
-                showAlert('Vardiya taşındı', 'success');
-                return;
-            }
-            
-            // Zaten bu vardiyada var mı? (Çift pozisyon için)
+            // Zaten bu vardiyada var mı?
             const existing = schedule[day][shiftId].find(a => a.staffId === staffId);
             
             if (existing) {
-                // Çift pozisyon ekle
+                // ÇİFT POZİSYON EKLE
                 const newPosition = selectPosition(s);
                 if (!newPosition) return;
                 
@@ -2640,23 +2666,9 @@
                 if (!existing.positions.includes(newPosition)) {
                     existing.positions.push(newPosition);
                     saveToStorage();
-                    
-        // Aktif vardiyaları başlat
-        if (!activeShifts || activeShifts.length === 0) {
-            activeShifts = ['morning', 'evening'];
-        }
-
-        // Schedule'ı tüm vardiyalar için başlat
-        days.forEach(day => {
-            if (!schedule[day]) schedule[day] = {};
-            shifts.forEach(shift => {
-                if (!schedule[day][shift.id]) schedule[day][shift.id] = [];
-            });
-        });
-
-        updateBadges();
+                    updateBadges();
                     renderSchedule();
-                    showAlert(`İkinci pozisyon eklendi: ${newPosition} (Saat değişmedi)`, 'success');
+                    showAlert(`İkinci pozisyon eklendi: ${newPosition} (Saat değişmedi - 8 saat)`, 'success');
                 } else {
                     showAlert('Bu pozisyon zaten atanmış!', 'error');
                 }
@@ -2664,11 +2676,25 @@
             }
             
             // Yeni atama
-            if (hasConflict(staffId, day, shiftId)) {
-                showAlert('Bu personel bu saatte başka bir vardiyada atanmış!', 'error');
+            if (type === 'move') {
+                const sourceDay = event.dataTransfer.getData('day');
+                const sourceShiftId = event.dataTransfer.getData('shiftId');
+                const sourceIndex = parseInt(event.dataTransfer.getData('index'));
+                
+                const assignment = schedule[sourceDay][sourceShiftId][sourceIndex];
+                
+                schedule[sourceDay][sourceShiftId].splice(sourceIndex, 1);
+                schedule[day][shiftId].push(assignment);
+                
+                saveToStorage();
+                updateBadges();
+                renderSchedule();
+                updateDashboard();
+                showAlert('Vardiya taşındı', 'success');
                 return;
             }
             
+            // Yeni personel atama
             const position = selectPosition(s);
             if (!position) return;
             
@@ -2677,36 +2703,23 @@
                 return;
             }
             
-            schedule[day][shiftId].push({ staffId, position });
+            schedule[day][shiftId].push({ 
+                staffId: staffId, 
+                position: position 
+            });
             
             saveToStorage();
-            
-        // Aktif vardiyaları başlat
-        if (!activeShifts || activeShifts.length === 0) {
-            activeShifts = ['morning', 'evening'];
-        }
-
-        // Schedule'ı tüm vardiyalar için başlat
-        days.forEach(day => {
-            if (!schedule[day]) schedule[day] = {};
-            shifts.forEach(shift => {
-                if (!schedule[day][shift.id]) schedule[day][shift.id] = [];
-            });
-        });
-
-        updateBadges();
+            updateBadges();
             renderSchedule();
-            showAlert('Vardiya atandı', 'success');
+            updateDashboard();
+            showAlert(`${s.name} vardiyaya atandı`, 'success');
         }
 
         
         function selectPosition(staffMember) {
-            const allPositions = [
-                'Kasiyer', 'Ocak', 'Mutfak', 'Garson', 'Temizlik',
-                'Restoran Kasa', 'Restoran Izgara', 'Restoran Garson'
-            ];
-            
+            // Mesul Müdür can be assigned to any position
             if (staffMember.role === 'Mesul Müdür') {
+                const allPositions = ["Izgara", "Mutfak", "Ocak", "Kasiyer", "Garson", "Temizlik"];
                 if (currentPoolFilter !== 'all' && allPositions.includes(currentPoolFilter)) {
                     return currentPoolFilter;
                 }
@@ -2720,6 +2733,7 @@
                 return allPositions[0];
             }
             
+            // If filter is active and staff has that position, use it
             if (currentPoolFilter !== 'all' && staffMember.positions.includes(currentPoolFilter)) {
                 return currentPoolFilter;
             }
@@ -2778,20 +2792,6 @@
         renderLeaveSummary();
             updateDashboard();
             initializeLeaves();
-        
-        // Aktif vardiyaları başlat
-        if (!activeShifts || activeShifts.length === 0) {
-            activeShifts = ['morning', 'evening'];
-        }
-
-        // Schedule'ı tüm vardiyalar için başlat
-        days.forEach(day => {
-            if (!schedule[day]) schedule[day] = {};
-            shifts.forEach(shift => {
-                if (!schedule[day][shift.id]) schedule[day][shift.id] = [];
-            });
-        });
-
         updateBadges();
             showAlert('Atama kaldırıldı', 'success');
         }
@@ -2818,7 +2818,7 @@
             showAlert('Hafta temizlendi', 'success');
         }
 
-        function exportToWhatsAppImage() { // Eski versiyon
+        function exportToWhatsApp() {
             let message = '';
             
             days.forEach(day => {
@@ -3180,20 +3180,6 @@
 
         function renderGamificationPage() {
             initializeLeaves();
-        
-        // Aktif vardiyaları başlat
-        if (!activeShifts || activeShifts.length === 0) {
-            activeShifts = ['morning', 'evening'];
-        }
-
-        // Schedule'ı tüm vardiyalar için başlat
-        days.forEach(day => {
-            if (!schedule[day]) schedule[day] = {};
-            shifts.forEach(shift => {
-                if (!schedule[day][shift.id]) schedule[day][shift.id] = [];
-            });
-        });
-
         updateBadges();
             renderLeaderboard();
             renderAllBadges();
@@ -3296,6 +3282,43 @@
         }
 
 
+
+        // ÖZEL GÜNLER
+        function openSpecialDayModal(day) {
+            if (day) {
+                document.getElementById('special-day-select').value = day;
+            }
+            document.getElementById('special-day-modal').classList.add('show');
+        }
+
+        function closeSpecialDayModal() {
+            document.getElementById('special-day-modal').classList.remove('show');
+        }
+
+        function saveSpecialDay(event) {
+            event.preventDefault();
+            
+            const day = document.getElementById('special-day-select').value;
+            const type = document.getElementById('special-day-type').value;
+            const name = document.getElementById('special-day-name').value;
+            
+            specialDays[day] = { type, name };
+            
+            saveToStorage();
+            closeSpecialDayModal();
+            renderSchedule();
+            showAlert(`Özel gün eklendi: ${name}`, 'success');
+        }
+
+        function removeSpecialDay(day) {
+            if (!confirm(`${day} için özel günü kaldırmak istediğinizden emin misiniz?`)) return;
+            
+            delete specialDays[day];
+            saveToStorage();
+            renderSchedule();
+            showAlert('Özel gün kaldırıldı', 'success');
+        }
+
         // LEAVE MANAGEMENT
         function initializeLeaves() {
             days.forEach(day => {
@@ -3384,297 +3407,6 @@
             container.innerHTML = html;
         }
 
-        // ==================== YENİ FONKSİYONLAR ====================
-
-// SEZON MODU GÜNCELLEMESİ
-function updateSeasonMode() {
-    seasonMode = document.getElementById('season-mode-select')?.value || seasonMode;
-    
-    const eveningShift = shifts.find(s => s.id === 'evening');
-    if (eveningShift) {
-        if (seasonMode === 'winter') {
-            eveningShift.time = '15:00-23:00';
-            eveningShift.end = 23;
-        } else if (seasonMode === 'summer') {
-            eveningShift.time = '15:00-00:00';
-            eveningShift.end = 24;
-        } else if (seasonMode === 'peak') {
-            eveningShift.time = '15:00-01:00';
-            eveningShift.end = 25;
-        }
-    }
-    
-    saveToStorage();
-    renderSchedule();
-    showToast(`Sezon modu güncellendi: ${seasonMode === 'winter' ? '❄️ Kış' : seasonMode === 'summer' ? '☀️ Yaz' : '🔥 Yoğun'}`);
-}
-
-// ÖZEL GÜN YÖNETİMİ
-function openSpecialDayModal(day) {
-    document.getElementById('special-day-select').value = day || 'Pazartesi';
-    document.getElementById('special-day-modal').classList.add('show');
-}
-
-function closeSpecialDayModal() {
-    document.getElementById('special-day-modal').classList.remove('show');
-}
-
-function saveSpecialDay(event) {
-    event.preventDefault();
-    
-    const day = document.getElementById('special-day-select').value;
-    const type = document.getElementById('special-day-type').value;
-    const name = document.getElementById('special-day-name').value;
-    
-    specialDays[day] = { type, name };
-    
-    saveToStorage();
-    closeSpecialDayModal();
-    renderSchedule();
-    showAlert(`Özel gün eklendi: ${name}`, 'success');
-}
-
-function removeSpecialDay(day) {
-    if (!confirm(`${day} için özel günü kaldırmak istediğinizden emin misiniz?`)) return;
-    
-    delete specialDays[day];
-    saveToStorage();
-    renderSchedule();
-    showAlert('Özel gün kaldırıldı', 'success');
-}
-
-// ÇATIŞMA KONTROLÜ
-function checkConflicts() {
-    conflictWarnings = [];
-    
-    days.forEach(day => {
-        // Her personel için kontroller
-        staff.forEach(s => {
-            let dayShifts = [];
-            let weekShifts = 0;
-            
-            // Bu gün kaç vardiya
-            activeShifts.forEach(shiftId => {
-                const assignments = schedule[day]?.[shiftId] || [];
-                if (assignments.some(a => a.staffId === s.id)) {
-                    dayShifts.push(shiftId);
-                }
-            });
-            
-            // Aynı gün birden fazla vardiya
-            if (dayShifts.length > 1) {
-                conflictWarnings.push({
-                    type: 'multiple_shifts',
-                    staff: s.name,
-                    day: day,
-                    message: `${s.name} - ${day} günü ${dayShifts.length} vardiyada!`
-                });
-            }
-            
-            // Haftalık toplam vardiya
-            days.forEach(d => {
-                activeShifts.forEach(shiftId => {
-                    const assignments = schedule[d]?.[shiftId] || [];
-                    if (assignments.some(a => a.staffId === s.id)) {
-                        weekShifts++;
-                    }
-                });
-            });
-            
-            // 45 saat kontrolü (her vardiya 8 saat)
-            if (weekShifts * 8 > 45) {
-                conflictWarnings.push({
-                    type: 'overtime',
-                    staff: s.name,
-                    message: `${s.name} bu hafta ${weekShifts * 8} saat! (Limit: 45 saat)`
-                });
-            }
-        });
-        
-        // Mesul Müdür kontrolü
-        const hasMesulMudur = activeShifts.some(shiftId => {
-            const assignments = schedule[day]?.[shiftId] || [];
-            return assignments.some(a => {
-                const staffMember = staff.find(st => st.id === a.staffId);
-                return staffMember && staffMember.role === 'Mesul Müdür';
-            });
-        });
-        
-        if (!hasMesulMudur && activeShifts.length > 0) {
-            conflictWarnings.push({
-                type: 'no_manager',
-                day: day,
-                message: `${day} günü Mesul Müdür atanmamış!`
-            });
-        }
-    });
-    
-    return conflictWarnings;
-}
-
-function displayConflicts() {
-    checkConflicts();
-    
-    const container = document.getElementById('conflict-warnings');
-    if (!container) return;
-    
-    if (conflictWarnings.length === 0) {
-        container.innerHTML = '<div style="color: var(--success); padding: 10px;">✅ Çakışma tespit edilmedi</div>';
-        return;
-    }
-    
-    container.innerHTML = conflictWarnings.map(w => `
-        <div class="conflict-warning">
-            <div class="conflict-warning-icon">⚠️</div>
-            <div>${w.message}</div>
-        </div>
-    `).join('');
-}
-
-// ÇİFT POZİSYON YÖNETİMİ
-function canAddSecondPosition(staffId, day, shiftId) {
-    const assignments = schedule[day]?.[shiftId] || [];
-    return assignments.some(a => a.staffId === staffId);
-}
-
-function addSecondPosition(staffId, day, shiftId, newPosition) {
-    const assignments = schedule[day][shiftId];
-    const existing = assignments.find(a => a.staffId === staffId);
-    
-    if (existing) {
-        if (!existing.positions) {
-            existing.positions = [existing.position];
-            delete existing.position;
-        }
-        
-        if (!existing.positions.includes(newPosition)) {
-            existing.positions.push(newPosition);
-            saveToStorage();
-            renderSchedule();
-            showAlert('İkinci pozisyon eklendi (Saat değişmedi)', 'success');
-            return true;
-        } else {
-            showAlert('Bu pozisyon zaten ekli!', 'error');
-            return false;
-        }
-    }
-    
-    return false;
-}
-
-// WHATSAPP GÖRSEL OLUŞTURMA
-function generateWhatsAppImage() {
-    let text = '══════════════════════════\n';
-    text += '🍽️ RUMELİ İSKELESİ\n';
-    text += '   HAFTALIK ÇİZELGE\n';
-    text += '══════════════════════════\n\n';
-    
-    const today = new Date();
-    const monday = new Date(today);
-    monday.setDate(today.getDate() - today.getDay() + 1);
-    const sunday = new Date(monday);
-    sunday.setDate(monday.getDate() + 6);
-    
-    text += `📅 ${monday.getDate()}.${monday.getMonth()+1} - ${sunday.getDate()}.${sunday.getMonth()+1}.${sunday.getFullYear()}\n\n`;
-    
-    days.forEach(day => {
-        const specialDay = specialDays[day];
-        
-        text += `━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
-        text += `📌 ${day.toUpperCase()}`;
-        
-        if (specialDay) {
-            const emoji = specialDay.type === 'bayram' ? '🎊' : 
-                         specialDay.type === 'festival' ? '🎭' : 
-                         specialDay.type === 'etkinlik' ? '🎪' : '💕';
-            text += ` ${emoji} ${specialDay.name}`;
-        }
-        
-        text += `\n━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n`;
-        
-        activeShifts.forEach(shiftId => {
-            const shift = shifts.find(s => s.id === shiftId);
-            if (!shift) return;
-            
-            const assignments = schedule[day]?.[shiftId] || [];
-            
-            if (assignments.length === 0) return;
-            
-            text += `⏰ ${shift.name} Vardiyası (${shift.time})\n`;
-            text += `─────────────────────────\n`;
-            
-            // Kafeterya
-            text += `☕ KAFETERYA:\n`;
-            ['Kasiyer', 'Ocak', 'Mutfak', 'Garson', 'Temizlik'].forEach(pos => {
-                const assigned = assignments.filter(a => {
-                    if (a.positions) return a.positions.includes(pos);
-                    return a.position === pos;
-                });
-                
-                if (assigned.length > 0) {
-                    text += `  ${positionEmojis[pos]} ${pos}: ${assigned.map(a => {
-                        const st = staff.find(s => s.id === a.staffId);
-                        let name = st?.name || '';
-                        if (a.positions && a.positions.length > 1) {
-                            const others = a.positions.filter(p => p !== pos);
-                            if (others.length > 0) {
-                                name += ` (+${others.join(', ')})`;
-                            }
-                        }
-                        return name;
-                    }).join(', ')}\n`;
-                }
-            });
-            
-            // Restoran
-            text += `\n🍽️ RESTORAN:\n`;
-            ['Restoran Kasa', 'Restoran Izgara', 'Restoran Garson'].forEach(pos => {
-                const assigned = assignments.filter(a => {
-                    if (a.positions) return a.positions.includes(pos);
-                    return a.position === pos;
-                });
-                
-                if (assigned.length > 0) {
-                    text += `  ${positionEmojis[pos]} ${pos.replace('Restoran ', '')}: ${assigned.map(a => {
-                        const st = staff.find(s => s.id === a.staffId);
-                        return st?.name || '';
-                    }).join(', ')}\n`;
-                }
-            });
-            
-            text += `\n`;
-        });
-        
-        // İzinli personel
-        const dayLeaves = leaves[day] || [];
-        if (dayLeaves.length > 0) {
-            text += `🏖️ İZİNLİ:\n`;
-            dayLeaves.forEach(leave => {
-                const st = staff.find(s => s.id === leave.staffId);
-                text += `  • ${st?.name} (${leave.type})\n`;
-            });
-            text += `\n`;
-        }
-    });
-    
-    text += `━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
-    text += `📝 Düzenleyen: Metehan Arslan\n`;
-    text += `══════════════════════════\n`;
-    
-    return text;
-}
-
-function exportToWhatsAppImage() {
-    const text = generateWhatsAppImage();
-    
-    navigator.clipboard.writeText(text).then(() => {
-        showToast('✅ Haftalık çizelge kopyalandı! WhatsApp\'a yapıştırabilirsiniz');
-    }).catch(() => {
-        showAlert('Kopyalama başarısız', 'error');
-    });
-}
-
-
         // Close modal on overlay click
         document.getElementById('staff-modal').addEventListener('click', (e) => {
             if (e.target.classList.contains('modal-overlay')) {
@@ -3693,52 +3425,6 @@ function exportToWhatsAppImage() {
                 closeLeaveModal();
             }
         });
-
-        document.getElementById('special-day-modal')?.addEventListener('click', (e) => {
-            if (e.target.classList.contains('modal-overlay')) {
-                closeSpecialDayModal();
-            }
-        });
-
-        document.getElementById('season-modal')?.addEventListener('click', (e) => {
-            if (e.target.classList.contains('modal-overlay')) {
-                closeSeasonModal();
-            }
-        });
-
-        // Sezon modu başlangıç ayarı
-        function openSeasonModal() {
-            document.getElementById('season-mode-select').value = seasonMode;
-            document.getElementById('extra1-check').checked = activeShifts.includes('extra1');
-            document.getElementById('extra2-check').checked = activeShifts.includes('extra2');
-            document.getElementById('extra3-check').checked = activeShifts.includes('extra3');
-            document.getElementById('season-modal').classList.add('show');
-        }
-
-        function closeSeasonModal() {
-            document.getElementById('season-modal').classList.remove('show');
-        }
-
-        function saveSeasonSettings() {
-            activeShifts = ['morning', 'evening'];
-            
-            if (document.getElementById('extra1-check').checked) activeShifts.push('extra1');
-            if (document.getElementById('extra2-check').checked) activeShifts.push('extra2');
-            if (document.getElementById('extra3-check').checked) activeShifts.push('extra3');
-            
-            saveToStorage();
-            renderSchedule();
-            closeSeasonModal();
-            showAlert('Vardiya ayarları güncellendi', 'success');
-        }
-
-        // Schedule render sonrası çatışma kontrolü
-        const oldRenderSchedule = renderSchedule;
-        renderSchedule = function() {
-            oldRenderSchedule();
-            displayConflicts();
-        };
-
     </script>
 </body>
 </html>
